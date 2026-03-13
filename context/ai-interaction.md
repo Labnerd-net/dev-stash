@@ -29,7 +29,7 @@ Do NOT commit without permission and until the build passes. If build fails, fix
 
 ## Branching
 
-We will create a new branch for every feature/fix. Name branch **feature/[feature]** or **fix/[fix]**, etc. Ask to delete the branch once merged.
+We will create a new branch for every feature/fix. Name branch **claude/feature/[feature]** or **claude/fix/[fix]**, etc. Ask to delete the branch once merged.
 
 ## Commits
 
