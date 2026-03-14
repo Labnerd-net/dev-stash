@@ -22,8 +22,9 @@
 
 # misc
 .DS_Store
-/.claude
 *.pem
+.claude/settings.json
+.claude/settings.local.json
 
 # debug
 npm-debug.log*
