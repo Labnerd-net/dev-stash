@@ -34,14 +34,12 @@ Everything else depends on this phase being solid before moving on.
 - [x] Verify session works across page navigations
 
 ### 5. Core Layout Shell
-- [ ] Root layout with dark mode default
-- [ ] Collapsible sidebar
-  - [ ] Item type links (Snippets, Prompts, Notes, etc.)
-  - [ ] Collections list (latest)
-  - [ ] Collapse/expand toggle
-- [ ] Main content area
-- [ ] Mobile: sidebar becomes drawer
-- [ ] Top bar / nav (if needed)
+- [x] Root layout with dark mode default
+- [x] Fixed sidebar
+  - [x] Item type links (Snippets, Prompts, Notes, Commands, Files, Images, Links)
+- [x] Main content area
+- [x] Top bar with search, New Item/Collection buttons, user + sign-out
+- [x] Dashboard with stats cards (Your Items, Collections, Favorites)
 
 ---
 
@@ -64,6 +62,7 @@ Everything else depends on this phase being solid before moving on.
 - [ ] Add item to collection
 - [ ] Remove item from collection
 - [ ] View all collections an item belongs to
+- [ ] Show latest collections list in sidebar
 
 ### 8. Tags
 - [ ] Add tags to items (on create and edit)
@@ -96,19 +95,23 @@ Everything else depends on this phase being solid before moving on.
 - [ ] "Recently used" section on dashboard/home view
 - [ ] Cap at last 10 items
 
-### 13. Copy to Clipboard + Keyboard Shortcuts
+### 13. Sidebar Enhancements
+- [ ] Collapse/expand toggle
+- [ ] Mobile: sidebar becomes drawer
+
+### 14. Copy to Clipboard + Keyboard Shortcuts
 - [ ] One-click copy button on all item cards and detail views
 - [ ] Toast confirmation on copy
 - [ ] Cmd+K command palette (search + quick actions)
 - [ ] Cmd+N opens new item drawer
 
-### 14. CodeMirror 6 + TipTap Editors
+### 15. CodeMirror 6 + TipTap Editors
 - [ ] Swap textarea for CodeMirror 6 on code-type items (snippet, command, prompt)
 - [ ] CodeMirror language detection based on item `language` field
 - [ ] Swap textarea for TipTap on note-type items
 - [ ] TipTap markdown support (bold, italic, headings, code blocks, lists)
 
-### 15. Shiki Syntax Highlighting
+### 16. Shiki Syntax Highlighting
 - [ ] Integrate Shiki for read/display view of code-type items
 - [ ] Use a VS Code-compatible dark theme
 - [ ] Language detection fallback for unknown types
@@ -117,21 +120,21 @@ Everything else depends on this phase being solid before moving on.
 
 ## Phase 4 — Advanced
 
-### 16. File Uploads (Cloudflare R2)
+### 17. File Uploads (Cloudflare R2)
 - [ ] Configure R2 bucket and credentials
 - [ ] Upload API route with progress tracking
 - [ ] File and image item creation flow
 - [ ] Display uploaded files/images in item detail
 - [ ] Delete file from R2 on item delete
 
-### 17. AI Features (Anthropic Claude Haiku)
+### 18. AI Features (Anthropic Claude Haiku)
 - [ ] Auto-tag suggestions on item create/edit
 - [ ] AI summary for text items
 - [ ] Explain This Code for snippet/command items
 - [ ] Prompt optimizer for prompt items
 - [ ] Loading states and error handling for all AI actions
 
-### 18. Export
+### 19. Export
 - [ ] Export all items as JSON
 - [ ] Export all items as Markdown (one file per item or combined)
 - [ ] Export single collection
