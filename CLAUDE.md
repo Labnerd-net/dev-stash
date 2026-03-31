@@ -30,7 +30,12 @@ No test runner is configured.
 
 ## Architecture
 
-This is a fresh Next.js App Router project. The entry point is [src/app/page.tsx](src/app/page.tsx). The root layout at [src/app/layout.tsx](src/app/layout.tsx) loads Geist fonts and wraps all pages.
+All authenticated routes live under the `src/app/(app)/` route group. The group layout (`src/app/(app)/layout.tsx`) handles session checks and renders the persistent shell (sidebar + header).
+
+- Root layout (`src/app/layout.tsx`) — Geist fonts, dark class, no app chrome
+- App layout (`src/app/(app)/layout.tsx`) — session guard, `<Sidebar>` + `<Header>` + `{children}`
+- Sidebar: `src/components/app/Sidebar.tsx`
+- Header: `src/components/app/Header.tsx`
 
 Path alias `@/*` maps to `./src/*`.
 
