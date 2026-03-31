@@ -25,13 +25,13 @@ Everything else depends on this phase being solid before moving on.
 - [x] Run seed and verify
 
 ### 4. Authentication (better-auth)
-- [ ] Configure better-auth with email/password provider
-- [ ] Set up Drizzle adapter for better-auth
-- [ ] Build sign-up page
-- [ ] Build sign-in page
-- [ ] Build sign-out
-- [ ] Protect app routes (redirect unauthenticated users)
-- [ ] Verify session works across page navigations
+- [x] Configure better-auth with email/password provider
+- [x] Set up Drizzle adapter for better-auth
+- [x] Build sign-up page
+- [x] Build sign-in page
+- [x] Build sign-out
+- [x] Protect app routes (redirect unauthenticated users)
+- [x] Verify session works across page navigations
 
 ### 5. Core Layout Shell
 - [ ] Root layout with dark mode default
