@@ -19,8 +19,9 @@
 - Server components by default
 - Only use `'use client'` when needed (interactivity, hooks, browser APIs)
 - Use Server Actions for form submissions and simple mutations
+- Auth is handled by better-auth — do not hand-roll auth logic
 - Use API routes when you need:
-  - Webhooks (Stripe, GitHub, etc.)
+  - Webhooks (GitHub, etc.)
   - File uploads with progress tracking
   - Long-running operations
   - Specific HTTP status codes or headers
@@ -72,14 +73,14 @@ Example v4 configuration:
 
 ## Database
 
-- Use Prisma ORM for all database operations
-- Always use `prisma migrate dev` for schema changes (not `db push`)
-- Run `prisma migrate status` before committing to verify migrations are in sync
-- Production deployments must run `prisma migrate deploy` before the app starts
+- Use Drizzle ORM for all database operations
+- Always use `drizzle-kit generate` to create migrations, then `drizzle-kit migrate` to apply
+- Never edit the database schema directly — always go through Drizzle migrations
+- Production deployments must run migrations before the app starts
 
 ## Data Fetching
 
-- Server components fetch directly with Prisma
+- Server components fetch directly with Drizzle
 - Client components use Server Actions
 - Validate all inputs with Zod
 

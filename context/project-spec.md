@@ -39,8 +39,8 @@ Items can have types. Users will be able to create custom types, but we will sta
 - prompt
 - note
 - command
-- file (pro only)
-- image (pro only)
+- file
+- image
 - link
 
 A type can be text (snippet, note, etc), url (link) or a file (file, image) URLs should look like - `/items/snippets`.
@@ -59,7 +59,7 @@ Some examples may be:
 
 C. **Search**
 
-Powerful search across:
+Full-text search using Postgres `to_tsvector` across:
 
 - Content
 - Tags
@@ -68,22 +68,26 @@ Powerful search across:
 
 D. **Authentication**
 
--Email/password or GitHub sign-in.
+- Email/password sign-in.
 
 E. **Other Features**
 
 - Collection and item favorites
 - Items pin to top
-- Recently used
+- Recently used (tracked in localStorage, not DB)
 - Import code from a file
-- Markdown editor for text types
+- CodeMirror 6 editor for code types (snippets, commands, prompts)
+- Markdown editor (TipTap) for note types
+- Shiki for syntax highlighting in read/display views
+- One-click copy to clipboard on all items
+- Keyboard shortcuts: Cmd+K command palette, Cmd+N new item
 - File upload for file types (file/image)
-- Export data as different formats
+- Export data as JSON or Markdown
 - Dark mode (default for devs)
 - Add/remove items to/from multiple collections
 - View which collections an item belongs to
 
-F. **AI Features (Pro only)**
+F. **AI Features**
 
 - AI auto-tag suggestions
 - AI Summaries
@@ -94,11 +98,7 @@ F. **AI Features (Pro only)**
 
 This is a rough mockup of what the data will look like. This is not set in stone:
 
-**USER** (extends NextAuth)
-
-- isPro (for paid users)
-- stripeCustomerId (for payments)
-- stripeSubscriptionId (for - subscription management)
+**USER**
 
 **ITEM**
 
@@ -157,52 +157,27 @@ This is a rough mockup of what the data will look like. This is not set in stone
 - One codebase/repo for less overhead
 - TypeScript for type safety
 
-**Database & ORM Neon**
-PostgreSQL & Prisma
+**Database & ORM**
+PostgreSQL & Drizzle
 
-- Database in the cloud
-- Prisma ORM for database connection and interaction
-- Prisma 7 latest (Fetch latest docs)
-- Redis for caching (Maybe)
+- Local PostgreSQL on Dokploy
+- Drizzle ORM for database connection and interaction
 - File Storage Cloudflare R2 for file uploads
-- Authentication Next-Auth v5
-- Email/password
-- GitHub Oauth
-- IMPORTANT: NEVER use db push or directly update db structure. We will create migrations that will be run in dev and then in prod.
+- Authentication: better-auth (email/password only)
+- IMPORTANT: NEVER directly update db structure. Always use drizzle-kit to generate migrations that will be run in dev and then in prod.
 
 **AI Integration**
 
-- OpenAI gpt-5-nano model
+- Anthropic Claude Haiku model
+
+**Editors & Highlighting**
+
+- CodeMirror 6 for code-type items (snippets, commands, prompts)
+- TipTap for note-type items (rich markdown)
+- Shiki for syntax highlighting in display/read views
 
 **CSS Frameworks**
 Tailwind CSS v4 with ShadCN UI
-
-## Monetization
-
-We will work on a freemium system.
-
-**Free:**
-
-- 50 items total
-- 3 collections
-- All system types except files/images
-- Basic search
-- No file or image uploads
-- No AI features
-
-**Pro ($8/month or $72/year):**
-
-- Unlimited items
-- Unlimited collections
-- File & Image uploads
-- Custom types (Will come later)
-- AI auto-tagging
-- AI code explanation
-- AI prompt optimizer
-- Export data (JSON/ZIP)
-- Priority support
-
-Setup the foundation for pro users, but during development, all users can access everything.
 
 ## UI/UX
 

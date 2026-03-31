@@ -54,7 +54,7 @@ Items can belong to one of the following built‑in types:
 - Image
 - URL
 
-Custom types allowed for Pro users.
+Custom types allowed.
 
 ### B) Collections
 
@@ -68,7 +68,7 @@ Examples:
 
 ### C) Search
 
-Full‑text search across:
+Full‑text search using Postgres `to_tsvector` across:
 
 - Content
 - Tags
@@ -78,16 +78,18 @@ Full‑text search across:
 ### D) Authentication
 
 - Email + Password
-- GitHub OAuth
 
 ### E) Additional Features
 
 - Favorites & pinned items
-- Recently used
+- Recently used (localStorage)
 - Import from files
-- Markdown editor for text items
+- CodeMirror 6 for code-type items, TipTap for notes
+- Shiki for syntax highlighting in display views
+- One-click copy to clipboard on all items
+- Keyboard shortcuts: Cmd+K command palette, Cmd+N new item
 - File uploads (images, docs, templates)
-- Export (JSON / ZIP)
+- Export (JSON / Markdown)
 - Dark mode (default)
 
 ### F) AI Superpowers
@@ -97,28 +99,25 @@ Full‑text search across:
 - Explain Code
 - Prompt optimization
 
-> AI powered by **OpenAI gpt-5-nano**
+> AI powered by **Anthropic claude haiku**
 
 ---
 
-## 🗄️ Data Model (Rough Prisma Draft)
+## 🗄️ Data Model (Rough Draft — using Drizzle, schema syntax for reference only)
 
 > This schema is a starting point and **will evolve**
 
 ```prisma
 model User {
-  id                   String   @id @default(cuid())
-  email                String   @unique
-  password             String?
-  isPro                Boolean  @default(false)
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  items                Item[]
-  itemTypes            ItemType[]
-  collections          Collection[]
-  tags                 Tag[]
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id          String       @id @default(cuid())
+  email       String       @unique
+  password    String?
+  items       Item[]
+  itemTypes   ItemType[]
+  collections Collection[]
+  tags        Tag[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Item {
@@ -141,9 +140,7 @@ model Item {
   typeId      String
   type        ItemType @relation(fields: [typeId], references: [id])
 
-  collectionId String?
-  collection   Collection? @relation(fields: [collectionId], references: [id])
-
+  collections ItemCollection[]
   tags        ItemTag[]
 
   createdAt   DateTime @default(now())
@@ -172,9 +169,20 @@ model Collection {
   userId      String
   user        User @relation(fields: [userId], references: [id])
 
-  items       Item[]
+  items       ItemCollection[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model ItemCollection {
+  itemId       String
+  collectionId String
+  addedAt      DateTime @default(now())
+
+  item         Item       @relation(fields: [itemId], references: [id])
+  collection   Collection @relation(fields: [collectionId], references: [id])
+
+  @@id([itemId, collectionId])
 }
 
 model Tag {
@@ -205,25 +213,12 @@ model ItemTag {
 | ------------ | ---------------------------- |
 | Framework    | **Next.js (React 19)**       |
 | Language     | TypeScript                   |
-| Database     | Neon PostgreSQL + Prisma ORM |
-| Caching      | Redis (optional)             |
+| Database     | PostgreSQL (Dokploy) + Drizzle ORM |
 | File Storage | Cloudflare R2                |
 | CSS/UI       | Tailwind CSS v4 + ShadCN     |
-| Auth         | NextAuth v5 (email + GitHub) |
-| AI           | OpenAI gpt-5-nano            |
-| Deployment   | Vercel (likely)              |
-| Monitoring   | Sentry (later)               |
-
----
-
-## 💰 Monetization
-
-| Plan | Price           | Limits                  | Features                                        |
-| ---- | --------------- | ----------------------- | ----------------------------------------------- |
-| Free | $0              | 50 items, 3 collections | Basic search, image uploads, no AI              |
-| Pro  | $8/mo or $72/yr | Unlimited               | File uploads, custom types, AI features, export |
-
-> Stripe for subscriptions + webhooks for syncing
+| Auth         | better-auth (email/password) |
+| AI           | Anthropic Claude Haiku       |
+| Deployment   | Dokploy (self-hosted)        |
 
 ---
 
@@ -252,10 +247,9 @@ model ItemTag {
 ```mermaid
 graph TD;
   Client <--> Next.API
-  Next.API --> Postgres[(Neon DB)]
+  Next.API --> Postgres[(Local DB)]
   Next.API --> R2[(File Storage)]
-  Next.API --> OpenAI
-  Next.API --> Redis[(Cache)]
+  Next.API --> Anthropic
 ```
 
 ---
@@ -265,9 +259,9 @@ graph TD;
 ```mermaid
 flowchart LR
   User --> Login
-  Login --> NextAuth
-  NextAuth --> Providers{Email / GitHub}
-  Providers --> Session
+  Login --> better-auth
+  better-auth --> Email/Password
+  Email/Password --> Session
   Session --> AppAccess
 ```
 
@@ -278,24 +272,9 @@ flowchart LR
 ```mermaid
 flowchart TD
   ItemContent --> API
-  API --> OpenAI
-  OpenAI --> Suggestions{{Tags / Summary / Explain Code}}
+  API --> Anthropic
+  Anthropic --> Suggestions{{Tags / Summary / Explain Code}}
   Suggestions --> UI_Update
-```
-
----
-
-## 🗂️ Development Workflow (For Course)
-
-- **One branch per lesson** (students can follow & compare)
-- Use **Cursor / Claude Code / ChatGPT** for assistance
-- Sentry for runtime monitoring & error tracking
-- GitHub Actions (optional for CI)
-
-**Branch examples**:
-
-```
-git switch -c lesson-01-setup
 ```
 
 ---
@@ -308,15 +287,13 @@ git switch -c lesson-01-setup
 - Collections
 - Search
 - Basic tags
-- Free tier limits
 
-### **Pro Phase**
+### **Phase 2**
 
 - AI features
 - Custom item types
 - File uploads
 - Export
-- Billing & upgrade flow
 
 ### **Future Enhancements**
 
