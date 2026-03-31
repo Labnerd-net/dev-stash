@@ -5,24 +5,24 @@
 Everything else depends on this phase being solid before moving on.
 
 ### 1. Dependencies & Configuration
-- [ ] Install Drizzle ORM + drizzle-kit
-- [ ] Install better-auth
-- [ ] Install and init ShadCN UI
-- [ ] Install CodeMirror 6
-- [ ] Install TipTap
-- [ ] Install Shiki
-- [ ] Configure `.env` (DB connection, better-auth secret, R2 credentials, Anthropic API key)
-- [ ] Verify Tailwind v4 + PostCSS config is correct
+- [x] Install Drizzle ORM + drizzle-kit
+- [x] Install better-auth
+- [x] Install and init ShadCN UI
+- [x] Install CodeMirror 6
+- [x] Install TipTap
+- [x] Install Shiki
+- [x] Configure `.env` (DB connection, better-auth secret, R2 credentials, Anthropic API key)
+- [x] Verify Tailwind v4 + PostCSS config is correct
 
 ### 2. Database Schema + Migration
-- [ ] Define Drizzle schema: User, Item, ItemType, Collection, ItemCollection, Tag, ItemTag
-- [ ] Generate and run initial migration
-- [ ] Verify schema in local Postgres
+- [x] Define Drizzle schema: User, Item, ItemType, Collection, ItemCollection, Tag, ItemTag
+- [x] Generate and run initial migration
+- [x] Verify schema in local Postgres
 
 ### 3. Seed System Item Types
-- [ ] Write seed script for system types: snippet, prompt, note, command, file, image, link
-- [ ] Assign correct colors and icons per spec
-- [ ] Run seed and verify
+- [x] Write seed script for system types: snippet, prompt, note, command, file, image, link
+- [x] Assign correct colors and icons per spec
+- [x] Run seed and verify
 
 ### 4. Authentication (better-auth)
 - [ ] Configure better-auth with email/password provider
