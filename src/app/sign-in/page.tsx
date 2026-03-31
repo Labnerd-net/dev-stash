@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
@@ -8,26 +8,25 @@ import { Button } from "@/components/ui/button";
 
 export default function SignInPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function handleSubmit(formData: FormData) {
     setError("");
-    setLoading(true);
+    startTransition(async () => {
+      const { error } = await authClient.signIn.email({
+        email: formData.get("email") as string,
+        password: formData.get("password") as string,
+      });
 
-    const { error } = await authClient.signIn.email({ email, password });
+      if (error) {
+        setError(error.message ?? "Invalid credentials.");
+        return;
+      }
 
-    if (error) {
-      setError(error.message ?? "Invalid credentials.");
-      setLoading(false);
-      return;
-    }
-
-    router.push("/");
-    router.refresh();
+      router.push("/");
+      router.refresh();
+    });
   }
 
   return (
@@ -40,18 +39,17 @@ export default function SignInPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <label htmlFor="email" className="text-sm font-medium">
               Email
             </label>
             <input
               id="email"
+              name="email"
               type="email"
               autoComplete="email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
               placeholder="you@example.com"
             />
@@ -63,11 +61,10 @@ export default function SignInPage() {
             </label>
             <input
               id="password"
+              name="password"
               type="password"
               autoComplete="current-password"
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
               placeholder="••••••••"
             />
@@ -77,8 +74,8 @@ export default function SignInPage() {
             <p className="text-sm text-destructive">{error}</p>
           )}
 
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Signing in…" : "Sign in"}
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? "Signing in…" : "Sign in"}
           </Button>
         </form>
 

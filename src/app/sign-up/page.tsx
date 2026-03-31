@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
@@ -8,27 +8,26 @@ import { Button } from "@/components/ui/button";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function handleSubmit(formData: FormData) {
     setError("");
-    setLoading(true);
+    startTransition(async () => {
+      const { error } = await authClient.signUp.email({
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        password: formData.get("password") as string,
+      });
 
-    const { error } = await authClient.signUp.email({ name, email, password });
+      if (error) {
+        setError(error.message ?? "Something went wrong.");
+        return;
+      }
 
-    if (error) {
-      setError(error.message ?? "Something went wrong.");
-      setLoading(false);
-      return;
-    }
-
-    router.push("/");
-    router.refresh();
+      router.push("/");
+      router.refresh();
+    });
   }
 
   return (
@@ -41,18 +40,17 @@ export default function SignUpPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <label htmlFor="name" className="text-sm font-medium">
               Name
             </label>
             <input
               id="name"
+              name="name"
               type="text"
               autoComplete="name"
               required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
               placeholder="Your name"
             />
@@ -64,11 +62,10 @@ export default function SignUpPage() {
             </label>
             <input
               id="email"
+              name="email"
               type="email"
               autoComplete="email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
               placeholder="you@example.com"
             />
@@ -80,12 +77,11 @@ export default function SignUpPage() {
             </label>
             <input
               id="password"
+              name="password"
               type="password"
               autoComplete="new-password"
               required
               minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
               placeholder="Min. 8 characters"
             />
@@ -95,8 +91,8 @@ export default function SignUpPage() {
             <p className="text-sm text-destructive">{error}</p>
           )}
 
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Creating account…" : "Create account"}
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? "Creating account…" : "Create account"}
           </Button>
         </form>
 
