@@ -1,38 +1,37 @@
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Package, FolderOpen, Star, Bookmark } from "lucide-react";
+import { count, eq, and } from "drizzle-orm";
+import { auth } from "@/lib/auth";
+import { db } from "@/db";
+import { items, collections } from "@/db/schema";
 
-const stats = [
-  {
-    label: "Your Items",
-    value: 0,
-    icon: Package,
-    color: "text-blue-400",
-    bg: "bg-blue-500/10",
-  },
-  {
-    label: "Collections",
-    value: 0,
-    icon: FolderOpen,
-    color: "text-teal-400",
-    bg: "bg-teal-500/10",
-  },
-  {
-    label: "Favorite Items",
-    value: 0,
-    icon: Star,
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
-  },
-  {
-    label: "Favorite Collections",
-    value: 0,
-    icon: Bookmark,
-    color: "text-purple-400",
-    bg: "bg-purple-500/10",
-  },
-];
+export default async function DashboardPage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect("/sign-in");
 
-export default function DashboardPage() {
+  const userId = session.user.id;
+
+  const [
+    [{ total: itemCount }],
+    [{ total: collectionCount }],
+    [{ total: favItemCount }],
+    [{ total: favCollectionCount }],
+  ] = await Promise.all([
+    db.select({ total: count() }).from(items).where(eq(items.userId, userId)),
+    db.select({ total: count() }).from(collections).where(eq(collections.userId, userId)),
+    db.select({ total: count() }).from(items).where(and(eq(items.userId, userId), eq(items.isFavorite, true))),
+    db.select({ total: count() }).from(collections).where(and(eq(collections.userId, userId), eq(collections.isFavorite, true))),
+  ]);
+
+  const stats = [
+    { label: "Your Items",           value: itemCount,          icon: Package,    color: "text-blue-400",   bg: "bg-blue-500/10"   },
+    { label: "Collections",          value: collectionCount,    icon: FolderOpen, color: "text-teal-400",   bg: "bg-teal-500/10"   },
+    { label: "Favorite Items",       value: favItemCount,       icon: Star,       color: "text-amber-400",  bg: "bg-amber-500/10"  },
+    { label: "Favorite Collections", value: favCollectionCount, icon: Bookmark,   color: "text-purple-400", bg: "bg-purple-500/10" },
+  ];
+
   return (
     <div className="space-y-8">
       <div>

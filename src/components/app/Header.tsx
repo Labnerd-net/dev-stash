@@ -44,7 +44,7 @@ export function Header({ user }: HeaderProps) {
         <Button variant="ghost" size="sm">
           New Collection
         </Button>
-        <Button size="sm">New Item</Button>
+        <Button size="sm" onClick={() => router.push("/items/new")}>New Item</Button>
         <div className="flex items-center gap-2 pl-2 border-l border-border">
           <span className="text-sm text-muted-foreground">
             {user.name || user.email}
