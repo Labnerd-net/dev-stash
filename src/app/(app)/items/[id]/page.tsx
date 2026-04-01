@@ -4,7 +4,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getItemById } from "@/lib/item-queries";
 import { TYPE_ID_TO_SLUG, TYPE_FIELD_CONFIG, ITEM_TYPE_MAP } from "@/lib/item-type-map";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/lib/button-variants";
 import { DeleteItemRedirect } from "@/components/items/DeleteItemRedirect";
 
 interface Props {

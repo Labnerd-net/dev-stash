@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { getItemsByType } from "@/lib/item-queries";
 import { ITEM_TYPE_MAP } from "@/lib/item-type-map";
 import { ItemList } from "@/components/items/ItemList";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/lib/button-variants";
 
 export default async function SnippetsPage() {
   const session = await auth.api.getSession({ headers: await headers() });
