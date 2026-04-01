@@ -49,4 +49,14 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Route protection is in `src/proxy.ts` (Next.js 16 renamed `middleware` → `proxy`)
 - Sign-up is restricted by `ALLOWED_EMAILS` env var (comma-separated); empty = open to all
 
+## Items
+
+- Server actions for mutations: `src/actions/items.ts` — `createItem`, `updateItem`, `deleteItem`
+- DB read helpers: `src/lib/item-queries.ts` — `getItemsByType`, `getItemById`
+- Item type map (slug → seeded typeId): `src/lib/item-type-map.ts` — also exports `TYPE_FIELD_CONFIG` (which fields each type shows) and `TYPE_ID_TO_SLUG` (for revalidation)
+- Seeded system type IDs are deterministic: `system_snippet`, `system_prompt`, `system_note`, `system_command`, `system_file`, `system_image`, `system_url`
+- Item components: `src/components/items/` — `ItemForm`, `ItemList`, `ItemRow`, `ItemTypeSelector`, `DeleteItemButton`, `DeleteItemRedirect`
+- `Button` uses `@base-ui/react/button` — no `asChild` prop; use `buttonVariants` from `@/components/ui/button` on `<Link>` elements instead
+- Item pages: `/items/new`, `/items/[id]`, `/items/[id]/edit` — `params` is a `Promise<{ id: string }>` in Next.js 16, must `await params`
+
 **IMPORTANT:** Do not add Claude to any commit messages
