@@ -56,7 +56,8 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Item type map (slug → seeded typeId): `src/lib/item-type-map.ts` — also exports `TYPE_FIELD_CONFIG` (which fields each type shows) and `TYPE_ID_TO_SLUG` (for revalidation)
 - Seeded system type IDs are deterministic: `system_snippet`, `system_prompt`, `system_note`, `system_command`, `system_file`, `system_image`, `system_url`
 - Item components: `src/components/items/` — `ItemForm`, `ItemList`, `ItemRow`, `ItemTypeSelector`, `DeleteItemButton`, `DeleteItemRedirect`
-- `Button` uses `@base-ui/react/button` — no `asChild` prop; use `buttonVariants` from `@/components/ui/button` on `<Link>` elements instead
+- `Button` uses `@base-ui/react/button` — no `asChild` prop; use `buttonVariants` on `<Link>` elements instead
+- Import `buttonVariants` from `@/lib/button-variants` in server components — NOT from `@/components/ui/button` (that file has `"use client"` and will throw at runtime)
 - Item pages: `/items/new`, `/items/[id]`, `/items/[id]/edit` — `params` is a `Promise<{ id: string }>` in Next.js 16, must `await params`
 
 **IMPORTANT:** Do not add Claude to any commit messages
