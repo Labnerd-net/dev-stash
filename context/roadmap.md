@@ -46,13 +46,14 @@ Everything else depends on this phase being solid before moving on.
 ## Phase 2 — Core Features
 
 ### 6. Items CRUD
-- [ ] Item list view (grid/list) filtered by type
+- [x] Item list view filtered by type
 - [ ] Quick-create item drawer (accessible from anywhere)
-- [ ] Item detail drawer (view/edit)
-- [ ] Create item (title, type, content)
-- [ ] Edit item
-- [ ] Delete item (with confirmation)
-- [ ] Item type color-coded cards
+- [x] Item detail page (view)
+- [x] Create item (title, type, content, url, description, language)
+- [x] Edit item
+- [x] Delete item (with confirmation)
+- [x] Item type color-coded indicators
+- Note: creation/edit uses dedicated pages (/items/new, /items/[id]/edit) rather than a drawer
 
 ### 7. Collections CRUD
 - [ ] Collections grid on main view (color-coded by dominant item type)
@@ -70,9 +71,9 @@ Everything else depends on this phase being solid before moving on.
 - [ ] Display tags on item cards
 
 ### 9. Item Type Filtering
-- [ ] Sidebar type links filter main view
-- [ ] URL reflects active filter (e.g. `/items/snippets`)
-- [ ] Active state on sidebar links
+- [x] Sidebar type links filter main view
+- [x] URL reflects active filter (e.g. `/snippets`)
+- [x] Active state on sidebar links
 
 ---
 
