@@ -47,7 +47,6 @@ Everything else depends on this phase being solid before moving on.
 
 ### 6. Items CRUD
 - [x] Item list view filtered by type
-- [ ] Quick-create item drawer (accessible from anywhere)
 - [x] Item detail page (view)
 - [x] Create item (title, type, content, url, description, language)
 - [x] Edit item
@@ -105,6 +104,7 @@ Everything else depends on this phase being solid before moving on.
 - [ ] Toast confirmation on copy
 - [ ] Cmd+K command palette (search + quick actions)
 - [ ] Cmd+N opens new item drawer
+- [ ] Quick-create item drawer (accessible from anywhere)
 
 ### 15. CodeMirror 6 + TipTap Editors
 - [ ] Swap textarea for CodeMirror 6 on code-type items (snippet, command, prompt)
