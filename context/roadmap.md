@@ -56,14 +56,14 @@ Everything else depends on this phase being solid before moving on.
 - Note: creation/edit uses dedicated pages (/items/new, /items/[id]/edit) rather than a drawer
 
 ### 7. Collections CRUD
-- [ ] Collections grid on main view (color-coded by dominant item type)
-- [ ] Create collection
-- [ ] Edit collection (name, description)
-- [ ] Delete collection (with confirmation)
-- [ ] Add item to collection
-- [ ] Remove item from collection
-- [ ] View all collections an item belongs to
-- [ ] Show latest collections list in sidebar
+- [x] Collections grid on main view (color-coded by dominant item type)
+- [x] Create collection
+- [x] Edit collection (name, description)
+- [x] Delete collection (with confirmation)
+- [x] Add item to collection
+- [x] Remove item from collection
+- [x] View all collections an item belongs to
+- [x] Show latest collections list in sidebar
 
 ### 8. Tags
 - [ ] Add tags to items (on create and edit)
