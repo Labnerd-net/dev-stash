@@ -60,4 +60,16 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Import `buttonVariants` from `@/lib/button-variants` in server components — NOT from `@/components/ui/button` (that file has `"use client"` and will throw at runtime)
 - Item pages: `/items/new`, `/items/[id]`, `/items/[id]/edit` — `params` is a `Promise<{ id: string }>` in Next.js 16, must `await params`
 
+## Collections
+
+- Server actions for mutations: `src/actions/collections.ts` — `createCollection`, `updateCollection`, `deleteCollection`, `removeItemFromCollection`
+- DB read helpers: `src/lib/collection-queries.ts` — `getCollections`, `getCollectionById`, `getCollectionItems`, `getLatestCollections`, `getCollectionsForItem`, `getAllCollectionsForUser`, `getAllItemsMinimal`
+- Collection components: `src/components/collections/` — `CollectionForm`, `CollectionCard`, `CollectionGrid`, `DeleteCollectionButton`, `DeleteCollectionRedirect`
+- Collection pages: `/collections`, `/collections/new`, `/collections/[id]`, `/collections/[id]/edit` — `params` is a `Promise<{ id: string }>` in Next.js 16, must `await params`
+- Item→collection assignment uses `CollectionSelector` component (`src/components/items/CollectionSelector.tsx`) rendered inside `ItemForm`; checkbox field name is `collectionId`
+- `CollectionSelector` renders a hidden `hasCollectionSelector=1` sentinel field; `updateItem` only syncs memberships when this field is present
+- `CollectionForm` item picker uses hidden inputs (`name="collectionItemId"`) driven by React state — not raw checkbox names — to correctly represent selected set
+- Sidebar is now an async server component (`src/components/app/Sidebar.tsx`) that fetches latest 10 collections; nav active-state logic is in `src/components/app/SidebarNav.tsx` (`'use client'`)
+- All `itemCollections` inserts verify ownership of both the collection AND the item before writing
+
 **IMPORTANT:** Do not add Claude to any commit messages

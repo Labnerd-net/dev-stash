@@ -1,30 +1,13 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  Code2,
-  Sparkles,
-  FileText,
-  Terminal,
-  File,
-  Image,
-  Link as LinkIcon,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { SidebarNav } from "./SidebarNav";
+import { getLatestCollections } from "@/lib/collection-queries";
 
-const navItems = [
-  { label: "Snippets", href: "/snippets", icon: Code2 },
-  { label: "Prompts", href: "/prompts", icon: Sparkles },
-  { label: "Notes", href: "/notes", icon: FileText },
-  { label: "Commands", href: "/commands", icon: Terminal },
-  { label: "Files", href: "/files", icon: File },
-  { label: "Images", href: "/images", icon: Image },
-  { label: "Links", href: "/links", icon: LinkIcon },
-];
+interface SidebarProps {
+  userId: string;
+}
 
-export function Sidebar() {
-  const pathname = usePathname();
+export async function Sidebar({ userId }: SidebarProps) {
+  const latestCollections = await getLatestCollections(userId);
 
   return (
     <aside className="flex flex-col w-[220px] shrink-0 h-full bg-sidebar border-r border-sidebar-border">
@@ -41,28 +24,7 @@ export function Sidebar() {
         <p className="px-2 mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
           Navigation
         </p>
-        <ul className="space-y-0.5">
-          {navItems.map(({ label, href, icon: Icon }) => {
-            const isActive =
-              pathname === href || pathname.startsWith(href + "/");
-            return (
-              <li key={href}>
-                <Link
-                  href={href}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors",
-                    isActive
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                      : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                  )}
-                >
-                  <Icon className="size-4 shrink-0" />
-                  {label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <SidebarNav />
 
         <div className="mt-5">
           <p className="px-2 mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -74,6 +36,15 @@ export function Sidebar() {
           >
             View all collections
           </Link>
+          {latestCollections.map((c) => (
+            <Link
+              key={c.id}
+              href={`/collections/${c.id}`}
+              className="flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors truncate"
+            >
+              {c.name}
+            </Link>
+          ))}
         </div>
       </nav>
     </aside>
