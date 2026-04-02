@@ -66,9 +66,9 @@ Everything else depends on this phase being solid before moving on.
 - [x] Show latest collections list in sidebar
 
 ### 8. Tags
-- [ ] Add tags to items (on create and edit)
-- [ ] Remove tags from items
-- [ ] Display tags on item cards
+- [x] Add tags to items (on create and edit)
+- [x] Remove tags from items
+- [x] Display tags on item cards
 
 ### 9. Item Type Filtering
 - [x] Sidebar type links filter main view
