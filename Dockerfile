@@ -39,6 +39,10 @@ COPY --from=builder /app/public ./public
 # Copy migrations and drizzle config so we can run them at startup
 COPY --from=builder /app/src/db/migrations ./src/db/migrations
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+
+# Copy seed script and schema so db:seed can run in the container
+COPY --from=builder /app/src/db/seed.ts ./src/db/seed.ts
+COPY --from=builder /app/src/db/schema.ts ./src/db/schema.ts
 COPY --from=builder /app/node_modules ./node_modules
 
 # Entrypoint script
