@@ -5,15 +5,19 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { itemTypes } from "@/db/schema";
 import { ItemForm } from "@/components/items/ItemForm";
+import { getAllCollectionsForUser } from "@/lib/collection-queries";
 
 export default async function NewItemPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const types = await db
-    .select()
-    .from(itemTypes)
-    .where(or(isNull(itemTypes.userId), eq(itemTypes.userId, session.user.id)));
+  const [types, userCollections] = await Promise.all([
+    db
+      .select()
+      .from(itemTypes)
+      .where(or(isNull(itemTypes.userId), eq(itemTypes.userId, session.user.id))),
+    getAllCollectionsForUser(session.user.id),
+  ]);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -23,7 +27,7 @@ export default async function NewItemPage() {
           Add a new item to your stash.
         </p>
       </div>
-      <ItemForm mode="create" types={types} />
+      <ItemForm mode="create" types={types} collections={userCollections} />
     </div>
   );
 }

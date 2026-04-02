@@ -6,6 +6,10 @@ import { db } from "@/db";
 import { itemTypes } from "@/db/schema";
 import { getItemById } from "@/lib/item-queries";
 import { ItemForm } from "@/components/items/ItemForm";
+import {
+  getAllCollectionsForUser,
+  getCollectionsForItem,
+} from "@/lib/collection-queries";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -16,12 +20,14 @@ export default async function EditItemPage({ params }: Props) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const [row, types] = await Promise.all([
+  const [row, types, userCollections, itemCollectionsList] = await Promise.all([
     getItemById(id, session.user.id),
     db
       .select()
       .from(itemTypes)
       .where(or(isNull(itemTypes.userId), eq(itemTypes.userId, session.user.id))),
+    getAllCollectionsForUser(session.user.id),
+    getCollectionsForItem(id, session.user.id),
   ]);
 
   if (!row) notFound();
@@ -49,6 +55,8 @@ export default async function EditItemPage({ params }: Props) {
           description: item.description ?? undefined,
           language: item.language ?? undefined,
         }}
+        collections={userCollections}
+        initialCollectionIds={itemCollectionsList.map((c) => c.id)}
       />
     </div>
   );

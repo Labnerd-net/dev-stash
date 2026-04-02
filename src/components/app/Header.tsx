@@ -41,7 +41,7 @@ export function Header({ user }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm">
+        <Button variant="ghost" size="sm" onClick={() => router.push("/collections/new")}>
           New Collection
         </Button>
         <Button size="sm" onClick={() => router.push("/items/new")}>New Item</Button>

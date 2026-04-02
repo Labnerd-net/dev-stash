@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ItemTypeSelector } from "./ItemTypeSelector";
+import { CollectionSelector } from "./CollectionSelector";
 import { COMMON_LANGUAGES, TYPE_FIELD_CONFIG } from "@/lib/item-type-map";
 import { createItem, updateItem } from "@/actions/items";
 import type { CreateItemInput } from "@/lib/item-schemas";
@@ -20,9 +21,11 @@ interface ItemFormProps {
   types: ItemType[];
   initialValues?: Partial<CreateItemInput & { id: string }>;
   defaultTypeId?: string;
+  collections?: { id: string; name: string }[];
+  initialCollectionIds?: string[];
 }
 
-export function ItemForm({ mode, types, initialValues, defaultTypeId }: ItemFormProps) {
+export function ItemForm({ mode, types, initialValues, defaultTypeId, collections, initialCollectionIds }: ItemFormProps) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
@@ -153,6 +156,13 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId }: ItemForm
           className={`${inputClass} resize-y`}
         />
       </div>
+
+      {collections && collections.length > 0 && (
+        <CollectionSelector
+          collections={collections}
+          initialSelectedIds={initialCollectionIds}
+        />
+      )}
 
       {error && (
         <p className="text-sm text-destructive">{error}</p>
