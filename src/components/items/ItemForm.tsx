@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ItemTypeSelector } from "./ItemTypeSelector";
 import { CollectionSelector } from "./CollectionSelector";
+import { TagSelector } from "./TagSelector";
 import { COMMON_LANGUAGES, TYPE_FIELD_CONFIG } from "@/lib/item-type-map";
 import { createItem, updateItem } from "@/actions/items";
 import type { CreateItemInput } from "@/lib/item-schemas";
@@ -23,9 +24,11 @@ interface ItemFormProps {
   defaultTypeId?: string;
   collections?: { id: string; name: string }[];
   initialCollectionIds?: string[];
+  userTags?: { id: string; name: string }[];
+  initialTagNames?: string[];
 }
 
-export function ItemForm({ mode, types, initialValues, defaultTypeId, collections, initialCollectionIds }: ItemFormProps) {
+export function ItemForm({ mode, types, initialValues, defaultTypeId, collections, initialCollectionIds, userTags, initialTagNames }: ItemFormProps) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
@@ -156,6 +159,11 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
           className={`${inputClass} resize-y`}
         />
       </div>
+
+      <TagSelector
+        userTags={userTags ?? []}
+        initialTagNames={initialTagNames}
+      />
 
       {collections && collections.length > 0 && (
         <CollectionSelector

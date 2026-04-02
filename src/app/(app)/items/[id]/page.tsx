@@ -4,6 +4,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getItemById } from "@/lib/item-queries";
 import { getCollectionsForItem } from "@/lib/collection-queries";
+import { getTagsForItem } from "@/lib/tag-queries";
 import { TYPE_ID_TO_SLUG, TYPE_FIELD_CONFIG, ITEM_TYPE_MAP } from "@/lib/item-type-map";
 import { buttonVariants } from "@/lib/button-variants";
 import { DeleteItemRedirect } from "@/components/items/DeleteItemRedirect";
@@ -17,9 +18,10 @@ export default async function ItemDetailPage({ params }: Props) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const [row, itemCollectionsList] = await Promise.all([
+  const [row, itemCollectionsList, itemTagNames] = await Promise.all([
     getItemById(id, session.user.id),
     getCollectionsForItem(id, session.user.id),
+    getTagsForItem(id, session.user.id),
   ]);
   if (!row) notFound();
 
@@ -81,6 +83,24 @@ export default async function ItemDetailPage({ params }: Props) {
           <pre className="rounded-lg border border-border bg-muted p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-words">
             {item.content}
           </pre>
+        </div>
+      )}
+
+      {itemTagNames.length > 0 && (
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Tags
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {itemTagNames.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
       )}
 

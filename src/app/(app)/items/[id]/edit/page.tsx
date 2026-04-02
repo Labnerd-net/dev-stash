@@ -10,6 +10,7 @@ import {
   getAllCollectionsForUser,
   getCollectionsForItem,
 } from "@/lib/collection-queries";
+import { getUserTags, getTagsForItem } from "@/lib/tag-queries";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -20,7 +21,7 @@ export default async function EditItemPage({ params }: Props) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const [row, types, userCollections, itemCollectionsList] = await Promise.all([
+  const [row, types, userCollections, itemCollectionsList, userTags, itemTagNames] = await Promise.all([
     getItemById(id, session.user.id),
     db
       .select()
@@ -28,6 +29,8 @@ export default async function EditItemPage({ params }: Props) {
       .where(or(isNull(itemTypes.userId), eq(itemTypes.userId, session.user.id))),
     getAllCollectionsForUser(session.user.id),
     getCollectionsForItem(id, session.user.id),
+    getUserTags(session.user.id),
+    getTagsForItem(id, session.user.id),
   ]);
 
   if (!row) notFound();
@@ -57,6 +60,8 @@ export default async function EditItemPage({ params }: Props) {
         }}
         collections={userCollections}
         initialCollectionIds={itemCollectionsList.map((c) => c.id)}
+        userTags={userTags}
+        initialTagNames={itemTagNames}
       />
     </div>
   );
