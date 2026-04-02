@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { eq, and, inArray } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { items, itemCollections, collections } from "@/db/schema";
+import { items, itemCollections, collections, tags, itemTags } from "@/db/schema";
 import {
   createItemSchema,
   updateItemSchema,
@@ -19,6 +19,36 @@ function revalidateItemPaths(typeId: string) {
   revalidatePath("/");
   const slug = TYPE_ID_TO_SLUG[typeId];
   if (slug) revalidatePath(`/${slug}`);
+}
+
+function normalizeTagNames(raw: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const name of raw) {
+    const norm = name.trim().toLowerCase();
+    if (norm && norm.length <= 50 && !seen.has(norm)) {
+      seen.add(norm);
+      result.push(norm);
+    }
+  }
+  return result;
+}
+
+async function upsertTags(names: string[], userId: string): Promise<string[]> {
+  if (names.length === 0) return [];
+
+  await db
+    .insert(tags)
+    .values(names.map((name) => ({ id: crypto.randomUUID(), name, userId })))
+    .onConflictDoNothing();
+
+  const rows = await db
+    .select({ id: tags.id, name: tags.name })
+    .from(tags)
+    .where(and(eq(tags.userId, userId), inArray(tags.name, names)));
+
+  const idMap = new Map(rows.map((t) => [t.name, t.id]));
+  return names.map((n) => idMap.get(n)!);
 }
 
 async function getOwnedCollectionIds(
@@ -79,6 +109,14 @@ export async function createItem(formData: FormData): Promise<ActionResult> {
     }
   }
 
+  const tagNames = normalizeTagNames(formData.getAll("tagName") as string[]);
+  const tagIds = await upsertTags(tagNames, session.user.id);
+  if (tagIds.length > 0) {
+    await db
+      .insert(itemTags)
+      .values(tagIds.map((tagId) => ({ itemId: id, tagId })));
+  }
+
   revalidateItemPaths(typeId);
   revalidatePath("/collections");
   return { success: true, data: { id } };
@@ -130,6 +168,18 @@ export async function updateItem(formData: FormData): Promise<ActionResult> {
       );
     }
     revalidatePath("/collections", "layout");
+  }
+
+  const hasTagSelector = formData.get("hasTagSelector") === "1";
+  if (hasTagSelector) {
+    const tagNames = normalizeTagNames(formData.getAll("tagName") as string[]);
+    const tagIds = await upsertTags(tagNames, session.user.id);
+    await db.delete(itemTags).where(eq(itemTags.itemId, id));
+    if (tagIds.length > 0) {
+      await db
+        .insert(itemTags)
+        .values(tagIds.map((tagId) => ({ itemId: id, tagId })));
+    }
   }
 
   revalidateItemPaths(typeId);

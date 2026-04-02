@@ -6,17 +6,19 @@ import { db } from "@/db";
 import { itemTypes } from "@/db/schema";
 import { ItemForm } from "@/components/items/ItemForm";
 import { getAllCollectionsForUser } from "@/lib/collection-queries";
+import { getUserTags } from "@/lib/tag-queries";
 
 export default async function NewItemPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const [types, userCollections] = await Promise.all([
+  const [types, userCollections, userTags] = await Promise.all([
     db
       .select()
       .from(itemTypes)
       .where(or(isNull(itemTypes.userId), eq(itemTypes.userId, session.user.id))),
     getAllCollectionsForUser(session.user.id),
+    getUserTags(session.user.id),
   ]);
 
   return (
@@ -27,7 +29,7 @@ export default async function NewItemPage() {
           Add a new item to your stash.
         </p>
       </div>
-      <ItemForm mode="create" types={types} collections={userCollections} />
+      <ItemForm mode="create" types={types} collections={userCollections} userTags={userTags} />
     </div>
   );
 }

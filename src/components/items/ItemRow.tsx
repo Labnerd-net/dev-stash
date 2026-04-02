@@ -7,6 +7,7 @@ import type { ItemWithType } from "@/lib/item-queries";
 
 interface ItemRowProps {
   row: ItemWithType;
+  tags?: string[];
 }
 
 function getPreview(row: ItemWithType): string {
@@ -15,7 +16,7 @@ function getPreview(row: ItemWithType): string {
   return text.length > 120 ? text.slice(0, 120) + "…" : text;
 }
 
-export function ItemRow({ row }: ItemRowProps) {
+export function ItemRow({ row, tags }: ItemRowProps) {
   const router = useRouter();
   const { item, itemType } = row;
   const preview = getPreview(row);
@@ -38,6 +39,18 @@ export function ItemRow({ row }: ItemRowProps) {
         </div>
         {preview && (
           <p className="text-xs text-muted-foreground truncate">{preview}</p>
+        )}
+        {tags && tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 pt-0.5">
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         )}
       </div>
       <div className="shrink-0 flex items-center gap-2">

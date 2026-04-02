@@ -72,4 +72,14 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Sidebar is now an async server component (`src/components/app/Sidebar.tsx`) that fetches latest 10 collections; nav active-state logic is in `src/components/app/SidebarNav.tsx` (`'use client'`)
 - All `itemCollections` inserts verify ownership of both the collection AND the item before writing
 
+## Tags
+
+- DB read helpers: `src/lib/tag-queries.ts` — `getUserTags`, `getTagsForItem`, `getTagsForItems`
+- Tag mutations are handled inside `createItem` / `updateItem` in `src/actions/items.ts` — no separate actions file
+- `TagSelector` component (`src/components/items/TagSelector.tsx`) — chip/pill input rendered inside `ItemForm` for all item types; uses hidden inputs (`name="tagName"`) + sentinel `hasTagSelector=1`; same pattern as `CollectionSelector`
+- `updateItem` only syncs tags when `hasTagSelector=1` sentinel is present (mirrors collection sentinel)
+- Tag names are normalized (trim + lowercase, max 50 chars, deduped) before upsert
+- `tags` table has a unique constraint on `(user_id, name)`; upsert uses `.onConflictDoNothing()` then re-fetches IDs
+- List pages use `getTagsForItems(itemIds[])` — one query per page — to build a `tagsMap` passed down to `ItemList` → `ItemRow`
+
 **IMPORTANT:** Do not add Claude to any commit messages

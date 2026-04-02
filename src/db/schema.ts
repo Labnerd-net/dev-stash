@@ -6,6 +6,7 @@ import {
   integer,
   primaryKey,
   index,
+  unique,
 } from "drizzle-orm/pg-core";
 
 // ─── Users ───────────────────────────────────────────────────────────────────
@@ -138,13 +139,17 @@ export const itemCollections = pgTable(
 
 // ─── Tags ─────────────────────────────────────────────────────────────────────
 
-export const tags = pgTable("tags", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-});
+export const tags = pgTable(
+  "tags",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (table) => [unique("tags_user_id_name_unique").on(table.userId, table.name)]
+);
 
 // ─── Item ↔ Tag (join table) ──────────────────────────────────────────────────
 

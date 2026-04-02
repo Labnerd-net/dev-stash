@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getItemsByType } from "@/lib/item-queries";
+import { getTagsForItems } from "@/lib/tag-queries";
 import { ITEM_TYPE_MAP } from "@/lib/item-type-map";
 import { ItemList } from "@/components/items/ItemList";
 import { buttonVariants } from "@/lib/button-variants";
@@ -13,6 +14,7 @@ export default async function CommandsPage() {
 
   const { typeId, label, singularLabel } = ITEM_TYPE_MAP.commands;
   const itemList = await getItemsByType(session.user.id, typeId);
+  const tagsMap = await getTagsForItems(itemList.map((r) => r.item.id), session.user.id);
 
   return (
     <div className="space-y-6">
@@ -27,7 +29,7 @@ export default async function CommandsPage() {
           New {singularLabel}
         </Link>
       </div>
-      <ItemList items={itemList} label={label} />
+      <ItemList items={itemList} label={label} tagsMap={tagsMap} />
     </div>
   );
 }
