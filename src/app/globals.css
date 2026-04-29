@@ -129,3 +129,21 @@
     @apply font-sans;
   }
 }
+
+.line-numbers {
+  counter-reset: line;
+}
+.line-numbers .line {
+  display: block;
+}
+.line-numbers .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 2ch;
+  min-width: 2ch;
+  margin-right: 1.5rem;
+  text-align: right;
+  color: oklch(50% 0 0);
+  user-select: none;
+}

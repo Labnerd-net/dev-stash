@@ -101,6 +101,13 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Header search is a native `<form action="/search">` — no JS needed, submits on Enter
 - Type filter chips on `/search` link to `/search?q=...&type=<typeId>`; validated against `ITEM_TYPE_MAP` before use
 
+## Shiki Syntax Highlighting
+
+- `highlightCode(code, language?)` in `src/lib/shiki.ts` — async server-side utility; singleton `createHighlighter` cached at module level (one-dark-pro theme, all COMMON_LANGUAGES pre-loaded); falls back to `'text'` for empty or unrecognized language values
+- Item detail page (`src/app/(app)/items/[id]/page.tsx`) uses `await highlightCode(item.content, item.language)` for `system_snippet`, `system_command`, `system_prompt`; output rendered via `dangerouslySetInnerHTML` in a `<div className="line-numbers ...">` wrapper
+- Line numbers are CSS-only: `.line-numbers` sets `counter-reset: line`; `.line-numbers .line::before` uses `counter-increment` — defined in `src/app/globals.css`; Shiki wraps each line in `<span class="line">` automatically
+- Note (`system_note`) type is excluded from Shiki — continues to render TipTap HTML via `dangerouslySetInnerHTML` with prose styling
+
 ## Editors
 
 - `CodeMirrorEditor` (`src/components/items/CodeMirrorEditor.tsx`) — client component; used for snippet, command, prompt types; props: `value`, `language?`, `onChange`; uses `@codemirror/theme-one-dark`, `basicSetup`, and a `Compartment` to reconfigure the language extension live when `language` prop changes

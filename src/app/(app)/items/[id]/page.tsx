@@ -6,10 +6,13 @@ import { getItemById } from "@/lib/item-queries";
 import { getCollectionsForItem } from "@/lib/collection-queries";
 import { getTagsForItem } from "@/lib/tag-queries";
 import { TYPE_ID_TO_SLUG, TYPE_FIELD_CONFIG, ITEM_TYPE_MAP } from "@/lib/item-type-map";
+import { highlightCode } from "@/lib/shiki";
 import { buttonVariants } from "@/lib/button-variants";
 import { DeleteItemRedirect } from "@/components/items/DeleteItemRedirect";
 import { FavoriteItemButton } from "@/components/items/FavoriteItemButton";
 import { PinItemButton } from "@/components/items/PinItemButton";
+
+const CODE_TYPE_IDS = new Set(["system_snippet", "system_command", "system_prompt"]);
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -88,6 +91,11 @@ export default async function ItemDetailPage({ params }: Props) {
             <div
               className="prose prose-sm prose-invert max-w-none rounded-lg border border-border bg-muted p-4"
               dangerouslySetInnerHTML={{ __html: item.content }}
+            />
+          ) : CODE_TYPE_IDS.has(item.typeId) ? (
+            <div
+              className="line-numbers overflow-hidden rounded-lg border border-border text-sm"
+              dangerouslySetInnerHTML={{ __html: await highlightCode(item.content, item.language) }}
             />
           ) : (
             <pre className="rounded-lg border border-border bg-muted p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-words">
