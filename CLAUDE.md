@@ -52,10 +52,10 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 ## Items
 
 - Server actions for mutations: `src/actions/items.ts` — `createItem`, `updateItem`, `deleteItem`
-- DB read helpers: `src/lib/item-queries.ts` — `getItemsByType`, `getItemById`, `searchItems`
+- DB read helpers: `src/lib/item-queries.ts` — `getItemsByType`, `getItemById`, `searchItems`, `getFavoriteItems`
 - Item type map (slug → seeded typeId): `src/lib/item-type-map.ts` — also exports `TYPE_FIELD_CONFIG` (which fields each type shows) and `TYPE_ID_TO_SLUG` (for revalidation)
 - Seeded system type IDs are deterministic: `system_snippet`, `system_prompt`, `system_note`, `system_command`, `system_file`, `system_image`, `system_url`
-- Item components: `src/components/items/` — `ItemForm`, `ItemList`, `ItemRow`, `ItemTypeSelector`, `DeleteItemButton`, `DeleteItemRedirect`
+- Item components: `src/components/items/` — `ItemForm`, `ItemList`, `ItemRow`, `ItemTypeSelector`, `DeleteItemButton`, `DeleteItemRedirect`, `FavoriteItemButton`, `PinItemButton`
 - `Button` uses `@base-ui/react/button` — no `asChild` prop; use `buttonVariants` on `<Link>` elements instead
 - Import `buttonVariants` from `@/lib/button-variants` in server components — NOT from `@/components/ui/button` (that file has `"use client"` and will throw at runtime)
 - Item pages: `/items/new`, `/items/[id]`, `/items/[id]/edit` — `params` is a `Promise<{ id: string }>` in Next.js 16, must `await params`
@@ -64,7 +64,7 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 
 - Server actions for mutations: `src/actions/collections.ts` — `createCollection`, `updateCollection`, `deleteCollection`, `removeItemFromCollection`
 - DB read helpers: `src/lib/collection-queries.ts` — `getCollections`, `getCollectionById`, `getCollectionItems`, `getLatestCollections`, `getCollectionsForItem`, `getAllCollectionsForUser`, `getAllItemsMinimal`
-- Collection components: `src/components/collections/` — `CollectionForm`, `CollectionCard`, `CollectionGrid`, `DeleteCollectionButton`, `DeleteCollectionRedirect`
+- Collection components: `src/components/collections/` — `CollectionForm`, `CollectionCard`, `CollectionGrid`, `DeleteCollectionButton`, `DeleteCollectionRedirect`, `FavoriteCollectionButton`
 - Collection pages: `/collections`, `/collections/new`, `/collections/[id]`, `/collections/[id]/edit` — `params` is a `Promise<{ id: string }>` in Next.js 16, must `await params`
 - Item→collection assignment uses `CollectionSelector` component (`src/components/items/CollectionSelector.tsx`) rendered inside `ItemForm`; checkbox field name is `collectionId`
 - `CollectionSelector` renders a hidden `hasCollectionSelector=1` sentinel field; `updateItem` only syncs memberships when this field is present
@@ -81,6 +81,17 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Tag names are normalized (trim + lowercase, max 50 chars, deduped) before upsert
 - `tags` table has a unique constraint on `(user_id, name)`; upsert uses `.onConflictDoNothing()` then re-fetches IDs
 - List pages use `getTagsForItems(itemIds[])` — one query per page — to build a `tagsMap` passed down to `ItemList` → `ItemRow`
+
+## Favorites and Pins
+
+- Toggle server actions: `src/actions/favorites.ts` — `toggleItemFavorite`, `toggleItemPin`, `toggleCollectionFavorite`; each fetches current value, flips it, and revalidates relevant paths
+- `getItemsByType` sorts pinned items first: `orderBy(desc(items.isPinned), desc(items.createdAt))`
+- `getFavoriteItems(userId)` returns all items where `isFavorite = true`, ordered by `desc(items.createdAt)`
+- `FavoriteItemButton` / `PinItemButton` are client components in `src/components/items/`; rendered in `ItemRow` and item detail page
+- `FavoriteCollectionButton` is a client component in `src/components/collections/`; rendered in `CollectionCard` and collection detail page
+- `CollectionCard` is a `<div>` wrapper (not `<Link>`) so the favorite button can coexist alongside the link
+- Favorites page: `src/app/(app)/favorites/page.tsx` — items only, reuses `ItemList` + `getTagsForItems`
+- Sidebar "Favorites" link (`/favorites`) uses `Heart` icon from lucide-react, listed first in `navItems`
 
 ## Search
 

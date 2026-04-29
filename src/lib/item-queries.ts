@@ -8,6 +8,15 @@ export async function getItemsByType(userId: string, typeId: string) {
     .from(items)
     .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
     .where(and(eq(items.userId, userId), eq(items.typeId, typeId)))
+    .orderBy(desc(items.isPinned), desc(items.createdAt));
+}
+
+export async function getFavoriteItems(userId: string) {
+  return db
+    .select({ item: items, itemType: itemTypes })
+    .from(items)
+    .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
+    .where(and(eq(items.userId, userId), eq(items.isFavorite, true)))
     .orderBy(desc(items.createdAt));
 }
 
