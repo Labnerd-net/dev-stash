@@ -36,15 +36,17 @@ export function SidebarNav() {
           <li key={href}>
             <Link
               href={href}
+              title={label}
               className={cn(
                 "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors",
+                "group-data-[collapsed=true]/sidebar:justify-center group-data-[collapsed=true]/sidebar:px-0",
                 isActive
                   ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                   : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
               )}
             >
               <Icon className="size-4 shrink-0" />
-              {label}
+              <span className="group-data-[collapsed=true]/sidebar:hidden">{label}</span>
             </Link>
           </li>
         );
