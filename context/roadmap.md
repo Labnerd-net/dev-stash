@@ -99,12 +99,9 @@ Everything else depends on this phase being solid before moving on.
 - [x] Collapse/expand toggle
 - [x] Mobile: sidebar becomes drawer
 
-### 14. Copy to Clipboard + Keyboard Shortcuts
+### 14. Copy to Clipboard
 - [ ] One-click copy button on all item cards and detail views
 - [ ] Toast confirmation on copy
-- [ ] Cmd+K command palette (search + quick actions)
-- [ ] Cmd+N opens new item drawer
-- [ ] Quick-create item drawer (accessible from anywhere)
 
 ### 15. CodeMirror 6 + TipTap Editors
 - [x] Swap textarea for CodeMirror 6 on code-type items (snippet, command, prompt)
@@ -143,3 +140,8 @@ Everything else depends on this phase being solid before moving on.
 - [ ] Export all items as Markdown (one file per item or combined)
 - [ ] Export single collection
 - [ ] Download trigger from UI
+
+### 21. Keyboard Shortcuts
+- [ ] Cmd+K command palette (search + quick actions)
+- [ ] Cmd+N opens quick-create item drawer
+- [ ] Quick-create item drawer accessible from anywhere

@@ -122,4 +122,12 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - `@tailwindcss/typography` is installed; registered via `@plugin "@tailwindcss/typography"` in `src/app/globals.css`
 - Language packages installed: javascript/typescript (`@codemirror/lang-javascript`), css, html, json, python, rust, sql, markdown, cpp/c; unmapped languages fall back to plaintext
 
+## Copy to Clipboard
+
+- `CopyButton` (`src/components/items/CopyButton.tsx`) — client component; props: `content: string | null | undefined`, `className?`; uses `navigator.clipboard.writeText`; strips HTML via `DOMParser` when content contains `<` (for note type); shows `toast.success` / `toast.error` from `sonner`
+- `<Toaster>` from `@/components/ui/sonner` is mounted in app layout (`position="bottom-right"`, `duration={2000}`)
+- `toast` is imported directly from `sonner` in components
+- `ItemRow` renders `CopyButton` with `opacity-0 group-hover:opacity-100 focus:opacity-100`; `<li>` has `group` class; file/image types pass `null` so button is not rendered
+- Item detail page passes `copyContent` derived from type: URL type → `item.url`, content types → `item.content`, file/image → `null`
+
 **IMPORTANT:** Do not add Claude to any commit messages

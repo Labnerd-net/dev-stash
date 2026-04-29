@@ -6,11 +6,26 @@ import { Pin } from "lucide-react";
 import { DeleteItemButton } from "./DeleteItemButton";
 import { FavoriteItemButton } from "./FavoriteItemButton";
 import { PinItemButton } from "./PinItemButton";
+import { CopyButton } from "./CopyButton";
 import type { ItemWithType } from "@/lib/item-queries";
 
 interface ItemRowProps {
   row: ItemWithType;
   tags?: string[];
+}
+
+const COPY_TYPE_IDS = new Set([
+  "system_snippet",
+  "system_command",
+  "system_prompt",
+  "system_note",
+]);
+
+function getCopyContent(row: ItemWithType): string | null {
+  const { item } = row;
+  if (COPY_TYPE_IDS.has(item.typeId)) return item.content ?? null;
+  if (item.typeId === "system_url") return item.url ?? null;
+  return null;
 }
 
 function getPreview(row: ItemWithType): string {
@@ -23,9 +38,10 @@ export function ItemRow({ row, tags }: ItemRowProps) {
   const router = useRouter();
   const { item, itemType } = row;
   const preview = getPreview(row);
+  const copyContent = getCopyContent(row);
 
   return (
-    <li className="flex items-start justify-between gap-4 px-4 py-3 hover:bg-muted/30 transition-colors">
+    <li className="group flex items-start justify-between gap-4 px-4 py-3 hover:bg-muted/30 transition-colors">
       <div className="min-w-0 flex-1 space-y-0.5">
         <div className="flex items-center gap-2">
           {item.isPinned && (
@@ -60,6 +76,10 @@ export function ItemRow({ row, tags }: ItemRowProps) {
         )}
       </div>
       <div className="shrink-0 flex items-center gap-1">
+        <CopyButton
+          content={copyContent}
+          className="opacity-0 group-hover:opacity-100 focus:opacity-100"
+        />
         <FavoriteItemButton itemId={item.id} isFavorite={item.isFavorite} />
         <PinItemButton itemId={item.id} isPinned={item.isPinned} />
         <span
