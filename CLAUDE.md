@@ -69,7 +69,11 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Item→collection assignment uses `CollectionSelector` component (`src/components/items/CollectionSelector.tsx`) rendered inside `ItemForm`; checkbox field name is `collectionId`
 - `CollectionSelector` renders a hidden `hasCollectionSelector=1` sentinel field; `updateItem` only syncs memberships when this field is present
 - `CollectionForm` item picker uses hidden inputs (`name="collectionItemId"`) driven by React state — not raw checkbox names — to correctly represent selected set
-- Sidebar is now an async server component (`src/components/app/Sidebar.tsx`) that fetches latest 10 collections; nav active-state logic is in `src/components/app/SidebarNav.tsx` (`'use client'`)
+- Sidebar is an async server component (`src/components/app/Sidebar.tsx`) that fetches latest 10 collections; nav active-state logic is in `src/components/app/SidebarNav.tsx` (`'use client'`)
+- Sidebar state (collapse + mobile drawer) is managed by `SidebarContext` (`src/components/app/SidebarContext.tsx`, `'use client'`) — `SidebarProvider` wraps the whole app layout; `useSidebar()` hook used by `Header`, `SidebarWrapper`, `SidebarCloseButton`
+- `SidebarWrapper` (`src/components/app/SidebarWrapper.tsx`, `'use client'`) renders the `<aside>` with `group/sidebar` and `data-collapsed` attribute; child components hide labels/sections via `group-data-[collapsed=true]/sidebar:hidden` Tailwind variants — no state passed into server components
+- `isCollapsed` is persisted to `localStorage` key `sidebar-collapsed`; defaults to `false` on SSR, hydrated client-side in `useEffect`
+- Mobile drawer closes automatically on route change via `usePathname` effect in `SidebarWrapper`
 - All `itemCollections` inserts verify ownership of both the collection AND the item before writing
 
 ## Tags

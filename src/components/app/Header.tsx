@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { useSidebar } from "./SidebarContext";
 
 interface User {
   name: string;
@@ -16,6 +17,7 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   const router = useRouter();
+  const { openMobile } = useSidebar();
 
   async function handleSignOut() {
     await authClient.signOut();
@@ -25,6 +27,14 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <header className="flex items-center h-14 px-4 gap-4 border-b border-border shrink-0">
+      <button
+        onClick={openMobile}
+        className="md:hidden p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+        aria-label="Open sidebar"
+      >
+        <Menu className="size-5" />
+      </button>
+
       <div className="flex-1 flex justify-center">
         <form action="/search" className="relative w-full max-w-sm">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
