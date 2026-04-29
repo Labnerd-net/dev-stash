@@ -6,9 +6,14 @@ import { Button } from "@/components/ui/button";
 import { ItemTypeSelector } from "./ItemTypeSelector";
 import { CollectionSelector } from "./CollectionSelector";
 import { TagSelector } from "./TagSelector";
+import { CodeMirrorEditor } from "./CodeMirrorEditor";
+import { TipTapEditor } from "./TipTapEditor";
 import { COMMON_LANGUAGES, TYPE_FIELD_CONFIG } from "@/lib/item-type-map";
 import { createItem, updateItem } from "@/actions/items";
 import type { CreateItemInput } from "@/lib/item-schemas";
+
+const CODE_TYPE_IDS = ["system_snippet", "system_command", "system_prompt"];
+const NOTE_TYPE_IDS = ["system_note"];
 
 interface ItemType {
   id: string;
@@ -36,6 +41,8 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
   const [selectedTypeId, setSelectedTypeId] = useState(
     defaultTypeId ?? initialValues?.typeId ?? types[0]?.id ?? ""
   );
+  const [contentValue, setContentValue] = useState(initialValues?.content ?? "");
+  const [selectedLanguage, setSelectedLanguage] = useState(initialValues?.language ?? "");
 
   const fieldConfig = TYPE_FIELD_CONFIG[selectedTypeId] ?? {
     hasContent: false,
@@ -79,7 +86,10 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
         <ItemTypeSelector
           types={types}
           value={selectedTypeId}
-          onChange={setSelectedTypeId}
+          onChange={(typeId) => {
+            setSelectedTypeId(typeId);
+            if (mode === "create") setContentValue("");
+          }}
           disabled={mode === "edit"}
         />
       </div>
@@ -101,15 +111,29 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
 
       {fieldConfig.hasContent && (
         <div className="space-y-1.5">
-          <label htmlFor="content" className="text-sm font-medium">Content</label>
-          <textarea
-            id="content"
-            name="content"
-            rows={10}
-            defaultValue={initialValues?.content ?? ""}
-            placeholder="Paste your content here…"
-            className={`${inputClass} resize-y font-mono`}
-          />
+          <label className="text-sm font-medium">Content</label>
+          <input type="hidden" name="content" value={contentValue} readOnly />
+          {CODE_TYPE_IDS.includes(selectedTypeId) ? (
+            <CodeMirrorEditor
+              value={contentValue}
+              language={selectedLanguage}
+              onChange={setContentValue}
+            />
+          ) : NOTE_TYPE_IDS.includes(selectedTypeId) ? (
+            <TipTapEditor
+              value={contentValue}
+              onChange={setContentValue}
+            />
+          ) : (
+            <textarea
+              id="content"
+              rows={10}
+              value={contentValue}
+              onChange={(e) => setContentValue(e.target.value)}
+              placeholder="Paste your content here…"
+              className={`${inputClass} resize-y font-mono`}
+            />
+          )}
         </div>
       )}
 
@@ -119,7 +143,8 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
           <select
             id="language"
             name="language"
-            defaultValue={initialValues?.language ?? ""}
+            value={selectedLanguage}
+            onChange={(e) => setSelectedLanguage(e.target.value)}
             className={inputClass}
           >
             <option value="">Select a language</option>

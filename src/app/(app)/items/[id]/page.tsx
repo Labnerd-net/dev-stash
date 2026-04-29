@@ -84,9 +84,16 @@ export default async function ItemDetailPage({ params }: Props) {
       {fieldConfig.hasContent && item.content && (
         <div className="space-y-1">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</p>
-          <pre className="rounded-lg border border-border bg-muted p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-words">
-            {item.content}
-          </pre>
+          {item.typeId === "system_note" ? (
+            <div
+              className="prose prose-sm prose-invert max-w-none rounded-lg border border-border bg-muted p-4"
+              dangerouslySetInnerHTML={{ __html: item.content }}
+            />
+          ) : (
+            <pre className="rounded-lg border border-border bg-muted p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-words">
+              {item.content}
+            </pre>
+          )}
         </div>
       )}
 
