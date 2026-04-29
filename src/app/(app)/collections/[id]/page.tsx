@@ -8,6 +8,7 @@ import {
 } from "@/lib/collection-queries";
 import { ItemList } from "@/components/items/ItemList";
 import { DeleteCollectionRedirect } from "@/components/collections/DeleteCollectionRedirect";
+import { FavoriteCollectionButton } from "@/components/collections/FavoriteCollectionButton";
 import { buttonVariants } from "@/lib/button-variants";
 
 interface Props {
@@ -40,6 +41,7 @@ export default async function CollectionDetailPage({ params }: Props) {
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <FavoriteCollectionButton collectionId={collection.id} isFavorite={collection.isFavorite} />
           <Link
             href={`/collections/${collection.id}/edit`}
             className={buttonVariants({ variant: "outline", size: "sm" })}

@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Pin } from "lucide-react";
 import { DeleteItemButton } from "./DeleteItemButton";
+import { FavoriteItemButton } from "./FavoriteItemButton";
+import { PinItemButton } from "./PinItemButton";
 import type { ItemWithType } from "@/lib/item-queries";
 
 interface ItemRowProps {
@@ -25,6 +28,9 @@ export function ItemRow({ row, tags }: ItemRowProps) {
     <li className="flex items-start justify-between gap-4 px-4 py-3 hover:bg-muted/30 transition-colors">
       <div className="min-w-0 flex-1 space-y-0.5">
         <div className="flex items-center gap-2">
+          {item.isPinned && (
+            <Pin className="size-3 shrink-0 text-amber-500" fill="currentColor" />
+          )}
           <Link
             href={`/items/${item.id}`}
             className="text-sm font-medium hover:underline truncate"
@@ -53,9 +59,11 @@ export function ItemRow({ row, tags }: ItemRowProps) {
           </div>
         )}
       </div>
-      <div className="shrink-0 flex items-center gap-2">
+      <div className="shrink-0 flex items-center gap-1">
+        <FavoriteItemButton itemId={item.id} isFavorite={item.isFavorite} />
+        <PinItemButton itemId={item.id} isPinned={item.isPinned} />
         <span
-          className="size-2 rounded-full"
+          className="size-2 rounded-full mx-1"
           style={{ backgroundColor: itemType.color ?? "#888" }}
         />
         <DeleteItemButton

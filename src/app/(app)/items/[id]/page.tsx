@@ -8,6 +8,8 @@ import { getTagsForItem } from "@/lib/tag-queries";
 import { TYPE_ID_TO_SLUG, TYPE_FIELD_CONFIG, ITEM_TYPE_MAP } from "@/lib/item-type-map";
 import { buttonVariants } from "@/lib/button-variants";
 import { DeleteItemRedirect } from "@/components/items/DeleteItemRedirect";
+import { FavoriteItemButton } from "@/components/items/FavoriteItemButton";
+import { PinItemButton } from "@/components/items/PinItemButton";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -49,6 +51,8 @@ export default async function ItemDetailPage({ params }: Props) {
           <h1 className="text-2xl font-semibold tracking-tight">{item.title}</h1>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <FavoriteItemButton itemId={item.id} isFavorite={item.isFavorite} />
+          <PinItemButton itemId={item.id} isPinned={item.isPinned} />
           <Link
             href={`/items/${item.id}/edit`}
             className={buttonVariants({ variant: "outline", size: "sm" })}

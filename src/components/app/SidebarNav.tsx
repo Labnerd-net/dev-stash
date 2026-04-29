@@ -10,10 +10,12 @@ import {
   File,
   Image,
   Link as LinkIcon,
+  Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
+  { label: "Favorites", href: "/favorites", icon: Heart },
   { label: "Snippets", href: "/snippets", icon: Code2 },
   { label: "Prompts", href: "/prompts", icon: Sparkles },
   { label: "Notes", href: "/notes", icon: FileText },

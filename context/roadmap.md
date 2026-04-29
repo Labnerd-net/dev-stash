@@ -79,10 +79,10 @@ Everything else depends on this phase being solid before moving on.
 ## Phase 3 — Usability
 
 ### 10. Search
-- [ ] Postgres full-text search index (`to_tsvector`) on title, content, tags
-- [ ] Search input in top bar
-- [ ] Search results page / live results dropdown
-- [ ] Filter results by type
+- [x] Postgres full-text search index (`to_tsvector`) on title, content, tags
+- [x] Search input in top bar
+- [x] Search results page
+- [x] Filter results by type
 
 ### 11. Favorites + Pins
 - [ ] Toggle favorite on items and collections
@@ -135,7 +135,10 @@ Everything else depends on this phase being solid before moving on.
 - [ ] Prompt optimizer for prompt items
 - [ ] Loading states and error handling for all AI actions
 
-### 19. Export
+### 19. Search Enhancements
+- [ ] Live results dropdown in header (debounced, keyboard-navigable)
+
+### 20. Export
 - [ ] Export all items as JSON
 - [ ] Export all items as Markdown (one file per item or combined)
 - [ ] Export single collection
