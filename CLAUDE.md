@@ -52,7 +52,7 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 ## Items
 
 - Server actions for mutations: `src/actions/items.ts` — `createItem`, `updateItem`, `deleteItem`
-- DB read helpers: `src/lib/item-queries.ts` — `getItemsByType`, `getItemById`
+- DB read helpers: `src/lib/item-queries.ts` — `getItemsByType`, `getItemById`, `searchItems`
 - Item type map (slug → seeded typeId): `src/lib/item-type-map.ts` — also exports `TYPE_FIELD_CONFIG` (which fields each type shows) and `TYPE_ID_TO_SLUG` (for revalidation)
 - Seeded system type IDs are deterministic: `system_snippet`, `system_prompt`, `system_note`, `system_command`, `system_file`, `system_image`, `system_url`
 - Item components: `src/components/items/` — `ItemForm`, `ItemList`, `ItemRow`, `ItemTypeSelector`, `DeleteItemButton`, `DeleteItemRedirect`
@@ -81,5 +81,13 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Tag names are normalized (trim + lowercase, max 50 chars, deduped) before upsert
 - `tags` table has a unique constraint on `(user_id, name)`; upsert uses `.onConflictDoNothing()` then re-fetches IDs
 - List pages use `getTagsForItems(itemIds[])` — one query per page — to build a `tagsMap` passed down to `ItemList` → `ItemRow`
+
+## Search
+
+- Search page: `src/app/(app)/search/page.tsx` — server component; reads `q` and `type` from searchParams
+- `searchItems(userId, query, typeId?)` in `src/lib/item-queries.ts` — uses `websearch_to_tsquery` for FTS (ILIKE fallback for ≤2 char queries), EXISTS subquery for tag matching, limited to 50 results
+- GIN expression index on `items(to_tsvector(title || content || description))` created in migration 0003
+- Header search is a native `<form action="/search">` — no JS needed, submits on Enter
+- Type filter chips on `/search` link to `/search?q=...&type=<typeId>`; validated against `ITEM_TYPE_MAP` before use
 
 **IMPORTANT:** Do not add Claude to any commit messages
