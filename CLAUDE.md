@@ -101,4 +101,14 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Header search is a native `<form action="/search">` — no JS needed, submits on Enter
 - Type filter chips on `/search` link to `/search?q=...&type=<typeId>`; validated against `ITEM_TYPE_MAP` before use
 
+## Editors
+
+- `CodeMirrorEditor` (`src/components/items/CodeMirrorEditor.tsx`) — client component; used for snippet, command, prompt types; props: `value`, `language?`, `onChange`; uses `@codemirror/theme-one-dark`, `basicSetup`, and a `Compartment` to reconfigure the language extension live when `language` prop changes
+- `TipTapEditor` (`src/components/items/TipTapEditor.tsx`) — client component; used for note type; props: `value`, `onChange`; uses `@tiptap/react` `StarterKit`; outputs HTML via `editor.getHTML()`; includes a toolbar with B/I/H1-H3/UL/OL/code/codeblock
+- Both editors submit content via a `<input type="hidden" name="content" value={contentValue} />` in `ItemForm` — FormData picks it up automatically
+- `ItemForm` routes to the correct editor via `CODE_TYPE_IDS` / `NOTE_TYPE_IDS` constants; `selectedLanguage` state drives the language dropdown and is passed to `CodeMirrorEditor`
+- Note item detail page renders content with `dangerouslySetInnerHTML` + `prose prose-sm prose-invert` styling; all other types keep `<pre>` block
+- `@tailwindcss/typography` is installed; registered via `@plugin "@tailwindcss/typography"` in `src/app/globals.css`
+- Language packages installed: javascript/typescript (`@codemirror/lang-javascript`), css, html, json, python, rust, sql, markdown, cpp/c; unmapped languages fall back to plaintext
+
 **IMPORTANT:** Do not add Claude to any commit messages
