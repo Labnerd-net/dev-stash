@@ -113,9 +113,9 @@ Everything else depends on this phase being solid before moving on.
 - [x] TipTap markdown support (bold, italic, headings, code blocks, lists)
 
 ### 16. Shiki Syntax Highlighting
-- [ ] Integrate Shiki for read/display view of code-type items
-- [ ] Use a VS Code-compatible dark theme
-- [ ] Language detection fallback for unknown types
+- [x] Integrate Shiki for read/display view of code-type items
+- [x] Use a VS Code-compatible dark theme
+- [x] Language detection fallback for unknown types
 
 ---
 
