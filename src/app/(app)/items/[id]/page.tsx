@@ -11,6 +11,7 @@ import { buttonVariants } from "@/lib/button-variants";
 import { DeleteItemRedirect } from "@/components/items/DeleteItemRedirect";
 import { FavoriteItemButton } from "@/components/items/FavoriteItemButton";
 import { PinItemButton } from "@/components/items/PinItemButton";
+import { CopyButton } from "@/components/items/CopyButton";
 
 const CODE_TYPE_IDS = new Set(["system_snippet", "system_command", "system_prompt"]);
 
@@ -35,6 +36,12 @@ export default async function ItemDetailPage({ params }: Props) {
   const typeSlug = TYPE_ID_TO_SLUG[item.typeId] ?? "/";
   const typeLabel = Object.values(ITEM_TYPE_MAP).find((v) => v.typeId === item.typeId)?.label ?? `${itemType.name}s`;
 
+  const copyContent = (() => {
+    if (item.typeId === "system_url") return item.url ?? null;
+    if (fieldConfig.hasContent) return item.content ?? null;
+    return null;
+  })();
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -54,6 +61,7 @@ export default async function ItemDetailPage({ params }: Props) {
           <h1 className="text-2xl font-semibold tracking-tight">{item.title}</h1>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <CopyButton content={copyContent} />
           <FavoriteItemButton itemId={item.id} isFavorite={item.isFavorite} />
           <PinItemButton itemId={item.id} isPinned={item.isPinned} />
           <Link
