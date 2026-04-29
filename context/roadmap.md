@@ -96,8 +96,8 @@ Everything else depends on this phase being solid before moving on.
 - [ ] Cap at last 10 items
 
 ### 13. Sidebar Enhancements
-- [ ] Collapse/expand toggle
-- [ ] Mobile: sidebar becomes drawer
+- [x] Collapse/expand toggle
+- [x] Mobile: sidebar becomes drawer
 
 ### 14. Copy to Clipboard + Keyboard Shortcuts
 - [ ] One-click copy button on all item cards and detail views
