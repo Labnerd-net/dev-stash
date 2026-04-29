@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { SidebarNav } from "./SidebarNav";
 import { SidebarWrapper } from "./SidebarWrapper";
 import { SidebarCloseButton } from "./SidebarCloseButton";
@@ -22,6 +23,18 @@ export async function Sidebar({ userId }: SidebarProps) {
           <span className="hidden group-data-[collapsed=true]/sidebar:inline">D</span>
         </Link>
         <SidebarCloseButton />
+      </div>
+
+      <div className="md:hidden px-3 py-2 border-b border-sidebar-border group-data-[collapsed=true]/sidebar:hidden">
+        <form action="/search" className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          <input
+            type="search"
+            name="q"
+            placeholder="Search items…"
+            className="w-full h-9 pl-8 pr-3 rounded-md bg-input/50 border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+        </form>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-3 overflow-x-hidden">

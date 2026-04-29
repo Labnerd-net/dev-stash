@@ -35,7 +35,7 @@ export function Header({ user }: HeaderProps) {
         <Menu className="size-5" />
       </button>
 
-      <div className="flex-1 flex justify-center">
+      <div className="flex-1 hidden md:flex justify-center">
         <form action="/search" className="relative w-full max-w-sm">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
           <input
