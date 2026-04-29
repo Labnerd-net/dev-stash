@@ -85,10 +85,10 @@ Everything else depends on this phase being solid before moving on.
 - [x] Filter results by type
 
 ### 11. Favorites + Pins
-- [ ] Toggle favorite on items and collections
-- [ ] Toggle pin on items
-- [ ] Pinned items surface at top of list views
-- [ ] Favorites filter/view
+- [x] Toggle favorite on items and collections
+- [x] Toggle pin on items
+- [x] Pinned items surface at top of list views
+- [x] Favorites filter/view
 
 ### 12. Recently Used (localStorage)
 - [ ] Track last-accessed item IDs in localStorage on open
