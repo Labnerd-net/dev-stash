@@ -100,8 +100,8 @@ Everything else depends on this phase being solid before moving on.
 - [x] Mobile: sidebar becomes drawer
 
 ### 14. Copy to Clipboard
-- [ ] One-click copy button on all item cards and detail views
-- [ ] Toast confirmation on copy
+- [x] One-click copy button on all item cards and detail views
+- [x] Toast confirmation on copy
 
 ### 15. CodeMirror 6 + TipTap Editors
 - [x] Swap textarea for CodeMirror 6 on code-type items (snippet, command, prompt)
