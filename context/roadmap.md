@@ -107,10 +107,10 @@ Everything else depends on this phase being solid before moving on.
 - [ ] Quick-create item drawer (accessible from anywhere)
 
 ### 15. CodeMirror 6 + TipTap Editors
-- [ ] Swap textarea for CodeMirror 6 on code-type items (snippet, command, prompt)
-- [ ] CodeMirror language detection based on item `language` field
-- [ ] Swap textarea for TipTap on note-type items
-- [ ] TipTap markdown support (bold, italic, headings, code blocks, lists)
+- [x] Swap textarea for CodeMirror 6 on code-type items (snippet, command, prompt)
+- [x] CodeMirror language detection based on item `language` field
+- [x] Swap textarea for TipTap on note-type items
+- [x] TipTap markdown support (bold, italic, headings, code blocks, lists)
 
 ### 16. Shiki Syntax Highlighting
 - [ ] Integrate Shiki for read/display view of code-type items
