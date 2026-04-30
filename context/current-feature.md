@@ -2,9 +2,9 @@
 
 ## Current Feature Spec File
 
-Title: Recently Used Items
-Spec file: context/specs/recently-used-items.md
-Branch: claude/feature/recently-used-items
+Title:
+Spec file:
+Branch:
 
 ## Current Feature Plan File
 
@@ -27,3 +27,4 @@ Plan file:
 - Shiki Syntax Highlighting: src/lib/shiki.ts with singleton createHighlighter (one-dark-pro theme, all COMMON_LANGUAGES pre-loaded) and highlightCode helper with 'text' fallback for unknown/empty languages; item detail page renders snippet/command/prompt content via Shiki HTML in a .line-numbers wrapper div; note type unchanged (prose HTML); line numbers via CSS counters on Shiki's .line spans added to globals.css — server-side only, zero client JS
 - Sidebar Enhancements: SidebarContext (client) provides isCollapsed/isMobileOpen state with localStorage persistence; SidebarWrapper (client) renders the <aside> with desktop collapse (220px↔52px via transition-[width]) and mobile fixed-drawer behavior; SidebarCloseButton (client) is an X button rendered inside the async server Sidebar for mobile; group-data-[collapsed=true]/sidebar CSS variants hide labels and collections section without passing state into server components; Header gets a mobile-only hamburger button that calls openMobile(); layout.tsx wrapped in SidebarProvider; route changes auto-close the mobile drawer via usePathname effect
 - Copy to Clipboard: CopyButton client component (src/components/items/CopyButton.tsx) uses navigator.clipboard.writeText; strips HTML via DOMParser for note type; toasts success/failure via sonner; Toaster mounted in app layout (bottom-right, 2s); ItemRow shows CopyButton on hover (opacity-0 group-hover:opacity-100, omitted for file/image types); item detail page always shows CopyButton in header actions; sonner + next-themes added as dependencies
+- Recently Used Items: recently-used.ts localStorage utility (pushRecentItem/getRecentItemIds, cap 10, dedup); RecentlyUsedTracker client component mounts on item detail page and records item ID; fetchRecentItems server action resolves IDs to items+tags scoped by userId; RecentlyUsedSection client component reads localStorage on mount, fetches items, renders ItemRow list on dashboard; getItemsByIds query helper added to item-queries.ts with recency-order sort; section hidden when list is empty or not yet mounted (SSR-safe)

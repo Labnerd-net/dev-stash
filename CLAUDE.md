@@ -130,4 +130,12 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - `ItemRow` renders `CopyButton` with `opacity-0 group-hover:opacity-100 focus:opacity-100`; `<li>` has `group` class; file/image types pass `null` so button is not rendered
 - Item detail page passes `copyContent` derived from type: URL type → `item.url`, content types → `item.content`, file/image → `null`
 
+## Recently Used Items
+
+- localStorage utility: `src/lib/recently-used.ts` — `pushRecentItem(id)` prepends + deduplicates + caps at 10; `getRecentItemIds()` reads safely (returns `[]` on SSR/error)
+- `RecentlyUsedTracker` (`src/components/items/RecentlyUsedTracker.tsx`) — client component, renders null, calls `pushRecentItem` once on mount via `useRef` + `useEffect`; mounted on item detail page
+- `fetchRecentItems(ids)` server action (`src/actions/recently-used.ts`) — resolves ID array to `{ items, tagsMap }` scoped by session userId; returns empty result if unauthenticated
+- `getItemsByIds(userId, ids[])` in `src/lib/item-queries.ts` — bulk fetch with `inArray`, client-side sort preserves recency order
+- `RecentlyUsedSection` (`src/components/dashboard/RecentlyUsedSection.tsx`) — client component on dashboard; reads localStorage + calls server action on mount; renders `ItemRow` list; hidden when empty or before hydration
+
 **IMPORTANT:** Do not add Claude to any commit messages

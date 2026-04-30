@@ -12,6 +12,7 @@ import { DeleteItemRedirect } from "@/components/items/DeleteItemRedirect";
 import { FavoriteItemButton } from "@/components/items/FavoriteItemButton";
 import { PinItemButton } from "@/components/items/PinItemButton";
 import { CopyButton } from "@/components/items/CopyButton";
+import { RecentlyUsedTracker } from "@/components/items/RecentlyUsedTracker";
 
 const CODE_TYPE_IDS = new Set(["system_snippet", "system_command", "system_prompt"]);
 
@@ -44,6 +45,7 @@ export default async function ItemDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      <RecentlyUsedTracker itemId={item.id} />
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 space-y-1">
           <div className="flex items-center gap-2">

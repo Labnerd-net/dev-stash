@@ -6,6 +6,7 @@ import { count, eq, and } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { items, collections } from "@/db/schema";
+import { RecentlyUsedSection } from "@/components/dashboard/RecentlyUsedSection";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -57,6 +58,8 @@ export default async function DashboardPage() {
           </div>
         ))}
       </div>
+
+      <RecentlyUsedSection />
 
       <div>
         <div className="flex items-center justify-between mb-4">

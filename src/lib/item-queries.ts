@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { items, itemTypes } from "@/db/schema";
-import { eq, and, or, desc, sql } from "drizzle-orm";
+import { eq, and, or, desc, sql, inArray } from "drizzle-orm";
 
 export async function getItemsByType(userId: string, typeId: string) {
   return db
@@ -30,6 +30,17 @@ export async function getItemById(id: string, userId: string) {
 }
 
 export type ItemWithType = Awaited<ReturnType<typeof getItemsByType>>[number];
+
+export async function getItemsByIds(userId: string, ids: string[]): Promise<ItemWithType[]> {
+  if (ids.length === 0) return [];
+  const rows = await db
+    .select({ item: items, itemType: itemTypes })
+    .from(items)
+    .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
+    .where(and(eq(items.userId, userId), inArray(items.id, ids)));
+  const indexMap = new Map(ids.map((id, i) => [id, i]));
+  return rows.sort((a, b) => (indexMap.get(a.item.id) ?? 0) - (indexMap.get(b.item.id) ?? 0));
+}
 
 export async function searchItems(
   userId: string,
