@@ -91,9 +91,9 @@ Everything else depends on this phase being solid before moving on.
 - [x] Favorites filter/view
 
 ### 12. Recently Used (localStorage)
-- [ ] Track last-accessed item IDs in localStorage on open
-- [ ] "Recently used" section on dashboard/home view
-- [ ] Cap at last 10 items
+- [x] Track last-accessed item IDs in localStorage on open
+- [x] "Recently used" section on dashboard/home view
+- [x] Cap at last 10 items
 
 ### 13. Sidebar Enhancements
 - [x] Collapse/expand toggle
