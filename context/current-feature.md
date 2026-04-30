@@ -2,9 +2,9 @@
 
 ## Current Feature Spec File
 
-Title:
-Spec file:
-Branch:
+Title: Recently Used Items
+Spec file: context/specs/recently-used-items.md
+Branch: claude/feature/recently-used-items
 
 ## Current Feature Plan File
 
