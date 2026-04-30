@@ -28,9 +28,16 @@ function getCopyContent(row: ItemWithType): string | null {
   return null;
 }
 
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
 function getPreview(row: ItemWithType): string {
   const { item } = row;
-  const text = item.content ?? item.url ?? item.description ?? "";
+  let text = item.content ?? item.url ?? item.description ?? "";
+  if (item.typeId === "system_note" && text.includes("<")) {
+    text = stripHtml(text);
+  }
   return text.length > 120 ? text.slice(0, 120) + "…" : text;
 }
 
