@@ -4,7 +4,7 @@ services:
     container_name: devstash-db
     user: 1000:1000
     environment:
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
       POSTGRES_DB: devstash
     ports:
       - 5433:5432

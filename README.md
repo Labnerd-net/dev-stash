@@ -7,10 +7,9 @@ A centralized developer knowledge hub for storing and searching code snippets, A
 - **Next.js 16** (App Router) + React 19
 - **TypeScript** (strict mode)
 - **Tailwind CSS v4** + shadcn/ui
-- **Neon PostgreSQL** + Prisma ORM
-- **NextAuth v5** (email + GitHub OAuth)
-- **Cloudflare R2** (file storage)
-- **OpenAI gpt-5-nano** (AI features)
+- **PostgreSQL** + Drizzle ORM
+- **better-auth** (email/password)
+- **Anthropic Claude** (AI features)
 
 ## Getting Started
 
@@ -20,6 +19,15 @@ npm run dev
 ```
 
 App runs at `http://localhost:3000`.
+
+## Environment Variables
+
+```
+DATABASE_URL=postgresql://user:password@host/dbname
+BETTER_AUTH_SECRET=your-secret-here
+BETTER_AUTH_URL=http://localhost:3000
+ALLOWED_EMAILS=you@example.com  # comma-separated; leave empty to allow all
+```
 
 ## Commands
 
@@ -36,7 +44,7 @@ src/
   app/           # Next.js App Router pages and layouts
   components/    # UI components
   actions/       # Server Actions
-  types/         # TypeScript types
   lib/           # Utilities and helpers
+  db/            # Drizzle schema, migrations, seed
 context/         # Project documentation and specs
 ```
