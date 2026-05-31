@@ -14,8 +14,10 @@ Read the following to get the full context of the project:
 
 ```bash
 npm run dev      # Start dev server at http://localhost:3000
-npm run build    # Production build
+npm run build    # Standard Next.js build
 npm run lint     # Run ESLint
+npm run preview  # Build + run locally as Cloudflare Worker (http://localhost:8787)
+npm run deploy   # Build + deploy to Cloudflare Workers
 ```
 
 No test runner is configured.
@@ -45,7 +47,7 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Auth is handled by **better-auth** (`src/lib/auth.ts`) with the Drizzle adapter (`usePlural: true`)
 - Client-side auth via `src/lib/auth-client.ts` — import `authClient` in client components
 - Server-side session via `auth.api.getSession({ headers: await headers() })` in server components
-- Route protection is in `src/proxy.ts` (Next.js 16 renamed `middleware` → `proxy`)
+- Route protection is in `src/middleware.ts` — uses Edge runtime (required for Cloudflare Workers); Next.js 16 added `proxy.ts` as a Node.js-runtime alternative but that is incompatible with Workers
 - Sign-up is restricted by `ALLOWED_EMAILS` env var (comma-separated); empty = open to all
 
 ## Items

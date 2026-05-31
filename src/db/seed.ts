@@ -1,9 +1,9 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 import { itemTypes } from "./schema";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const db = drizzle(pool);
+const sql = neon(process.env.DATABASE_URL_UNPOOLED!);
+const db = drizzle(sql);
 
 const SYSTEM_ITEM_TYPES = [
   {

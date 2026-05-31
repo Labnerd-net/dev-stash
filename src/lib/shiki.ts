@@ -1,15 +1,39 @@
-import { createHighlighter } from "shiki";
+import { createHighlighterCore } from "shiki/core";
+import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import { COMMON_LANGUAGES } from "@/lib/item-type-map";
 
-type Highlighter = Awaited<ReturnType<typeof createHighlighter>>;
+type HighlighterCore = Awaited<ReturnType<typeof createHighlighterCore>>;
 
-let highlighterPromise: Promise<Highlighter> | null = null;
+let highlighterPromise: Promise<HighlighterCore> | null = null;
 
-function getHighlighter(): Promise<Highlighter> {
+function getHighlighter(): Promise<HighlighterCore> {
   if (!highlighterPromise) {
-    highlighterPromise = createHighlighter({
-      themes: ["one-dark-pro"],
-      langs: [...COMMON_LANGUAGES],
+    highlighterPromise = createHighlighterCore({
+      themes: [import("@shikijs/themes/one-dark-pro")],
+      langs: [
+        import("@shikijs/langs/bash"),
+        import("@shikijs/langs/c"),
+        import("@shikijs/langs/cpp"),
+        import("@shikijs/langs/css"),
+        import("@shikijs/langs/dockerfile"),
+        import("@shikijs/langs/go"),
+        import("@shikijs/langs/html"),
+        import("@shikijs/langs/java"),
+        import("@shikijs/langs/javascript"),
+        import("@shikijs/langs/json"),
+        import("@shikijs/langs/kotlin"),
+        import("@shikijs/langs/markdown"),
+        import("@shikijs/langs/php"),
+        import("@shikijs/langs/python"),
+        import("@shikijs/langs/ruby"),
+        import("@shikijs/langs/rust"),
+        import("@shikijs/langs/sql"),
+        import("@shikijs/langs/swift"),
+        import("@shikijs/langs/toml"),
+        import("@shikijs/langs/typescript"),
+        import("@shikijs/langs/yaml"),
+      ],
+      engine: createJavaScriptRegexEngine(),
     });
   }
   return highlighterPromise;
