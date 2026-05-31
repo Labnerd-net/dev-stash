@@ -2,13 +2,13 @@
 
 ## Current Feature Spec File
 
-Title:
-Spec file:
-Branch:
+Title: Cloudflare Workers Migration
+Spec file: context/specs/cloudflare-workers-migration.md
+Branch: claude/feature/cloudflare-workers-migration
 
 ## Current Feature Plan File
 
-Plan file:
+Plan file: context/features/cloudflare-workers-migration.md
 
 ## History
 
