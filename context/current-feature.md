@@ -2,13 +2,13 @@
 
 ## Current Feature Spec File
 
-Title:
+Title: Neon Postgres Migration
 Spec file:
-Branch:
+Branch: claude/feature/neon-migration
 
 ## Current Feature Plan File
 
-Plan file:
+Plan file: @context/features/neon-migration.md
 
 ## History
 
