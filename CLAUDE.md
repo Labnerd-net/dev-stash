@@ -42,6 +42,13 @@ Path alias `@/*` maps to `./src/*`.
 
 ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat config format.
 
+## Database
+
+- DB client: `src/db/index.ts` — exports `db` (lazy Proxy singleton); import as `import { db } from "@/db"`
+- Schema: `src/db/schema.ts`; migrations in `src/db/migrations/`
+- Driver: `@neondatabase/serverless` + `drizzle-orm/neon-http`; requires `DATABASE_URL` (pooled) at runtime and `DATABASE_URL_UNPOOLED` (direct) for migrations
+- Lazy init avoids build-time failures on Cloudflare Workers (Neon client can't be called at import time)
+
 ## Auth
 
 - Auth is handled by **better-auth** (`src/lib/auth.ts`) with the Drizzle adapter (`usePlural: true`)
