@@ -1,5 +1,3 @@
-export const runtime = "edge";
-
 import { headers } from "next/headers";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { auth } from "@/lib/auth";

@@ -103,15 +103,19 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
       }
     };
     xhr.onload = () => {
-      if (xhr.status === 200) {
-        const res = JSON.parse(xhr.responseText) as { key: string; fileName: string; fileSize: number };
-        setFileKey(res.key);
-        setFileName(res.fileName);
-        setFileSize(res.fileSize);
-        setUploadState("done");
-      } else {
-        const res = JSON.parse(xhr.responseText) as { error?: string };
-        setUploadError(res.error ?? "Upload failed");
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if (xhr.status === 200) {
+          setFileKey(res.key);
+          setFileName(res.fileName);
+          setFileSize(res.fileSize);
+          setUploadState("done");
+        } else {
+          setUploadError(res.error ?? `Upload failed (${xhr.status})`);
+          setUploadState("error");
+        }
+      } catch {
+        setUploadError(`Upload failed (${xhr.status})`);
         setUploadState("error");
       }
     };
