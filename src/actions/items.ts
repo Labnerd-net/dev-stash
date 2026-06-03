@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { eq, and, inArray } from "drizzle-orm";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { items, itemCollections, collections, tags, itemTags } from "@/db/schema";
@@ -77,6 +78,11 @@ export async function createItem(formData: FormData): Promise<ActionResult> {
   const { title, typeId, content, url, description, language } = parsed.data;
   const id = crypto.randomUUID();
 
+  const fileKey = formData.get("fileKey") as string | null;
+  const rawFileName = formData.get("fileName") as string | null;
+  const rawFileSize = formData.get("fileSize") as string | null;
+  const isFileType = fileKey != null && fileKey.length > 0;
+
   await db.insert(items).values({
     id,
     title,
@@ -85,7 +91,10 @@ export async function createItem(formData: FormData): Promise<ActionResult> {
     url: url || null,
     description: description ?? null,
     language: language ?? null,
-    contentType: "text",
+    contentType: isFileType ? "file" : "text",
+    fileUrl: isFileType ? fileKey : null,
+    fileName: isFileType ? rawFileName : null,
+    fileSize: isFileType && rawFileSize ? parseInt(rawFileSize, 10) : null,
     userId: session.user.id,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -133,6 +142,21 @@ export async function updateItem(formData: FormData): Promise<ActionResult> {
 
   const { id, title, typeId, content, url, description, language } = parsed.data;
 
+  const newFileKey = formData.get("fileKey") as string | null;
+  const oldFileKey = formData.get("oldFileKey") as string | null;
+  const rawFileName = formData.get("fileName") as string | null;
+  const rawFileSize = formData.get("fileSize") as string | null;
+  const replacingFile = newFileKey != null && newFileKey.length > 0;
+
+  const fileUpdateFields = replacingFile
+    ? {
+        contentType: "file" as const,
+        fileUrl: newFileKey,
+        fileName: rawFileName,
+        fileSize: rawFileSize ? parseInt(rawFileSize, 10) : null,
+      }
+    : {};
+
   const updated = await db
     .update(items)
     .set({
@@ -142,12 +166,22 @@ export async function updateItem(formData: FormData): Promise<ActionResult> {
       url: url || null,
       description: description ?? null,
       language: language ?? null,
+      ...fileUpdateFields,
       updatedAt: new Date(),
     })
     .where(and(eq(items.id, id), eq(items.userId, session.user.id)))
     .returning({ id: items.id });
 
   if (updated.length === 0) return { success: false, error: "Not found" };
+
+  if (replacingFile && oldFileKey && oldFileKey.length > 0 && oldFileKey !== newFileKey) {
+    try {
+      const { env } = getCloudflareContext();
+      await env.dev_stash_files.delete(oldFileKey);
+    } catch {
+      // R2 delete failure is non-fatal; item is already updated
+    }
+  }
 
   const hasCollectionSelector =
     formData.get("hasCollectionSelector") === "1";
@@ -198,9 +232,24 @@ export async function deleteItem(formData: FormData): Promise<ActionResult> {
 
   const { id } = parsed.data;
 
+  const existing = await db
+    .select({ fileUrl: items.fileUrl })
+    .from(items)
+    .where(and(eq(items.id, id), eq(items.userId, session.user.id)));
+
   await db
     .delete(items)
     .where(and(eq(items.id, id), eq(items.userId, session.user.id)));
+
+  const fileKey = existing[0]?.fileUrl;
+  if (fileKey) {
+    try {
+      const { env } = getCloudflareContext();
+      await env.dev_stash_files.delete(fileKey);
+    } catch {
+      // R2 delete failure is non-fatal; item is already deleted
+    }
+  }
 
   revalidatePath("/");
   return { success: true };

@@ -49,6 +49,17 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Driver: `@neondatabase/serverless` + `drizzle-orm/neon-http`; requires `DATABASE_URL` (pooled) at runtime and `DATABASE_URL_UNPOOLED` (direct) for migrations
 - Lazy init avoids build-time failures on Cloudflare Workers (Neon client can't be called at import time)
 
+## File Uploads (R2)
+
+- R2 bucket binding: `dev_stash_files` in `wrangler.jsonc`; typed in `worker-configuration.d.ts` (extends global `CloudflareEnv`)
+- Access R2 in API routes and server actions via `getCloudflareContext().env.dev_stash_files` from `@opennextjs/cloudflare`
+- Upload: `POST /api/upload` (`src/app/api/upload/route.ts`) — Edge runtime; validates size ≤25 MB and MIME type; stores object at `uploads/<userId>/<uuid>-<filename>`; returns `{ key, fileName, fileSize }`
+- Download: `GET /api/files/[id]` (`src/app/api/files/[id]/route.ts`) — Edge runtime; ownership check via `getItemById`; streams from R2; images served `inline`, files as `attachment`
+- Only the R2 object key is stored in the DB (`items.fileUrl`); download URLs are always `/api/files/<itemId>` — never the raw key
+- `items.contentType` is `"file"` for file/image items, `"text"` for all others
+- `deleteItem` fetches `fileUrl` before deleting the row, then deletes the R2 object; R2 failures are non-fatal (caught and ignored)
+- `TYPE_FIELD_CONFIG` has `hasFile: boolean` — true for `system_file` and `system_image`; drives form and detail page conditionals
+
 ## Auth
 
 - Auth is handled by **better-auth** (`src/lib/auth.ts`) with the Drizzle adapter (`usePlural: true`)
