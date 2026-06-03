@@ -119,11 +119,11 @@ Everything else depends on this phase being solid before moving on.
 ## Phase 4 — Advanced
 
 ### 17. File Uploads (Cloudflare R2)
-- [ ] Configure R2 bucket and credentials
-- [ ] Upload API route with progress tracking
-- [ ] File and image item creation flow
-- [ ] Display uploaded files/images in item detail
-- [ ] Delete file from R2 on item delete
+- [x] Configure R2 bucket and credentials
+- [x] Upload API route with progress tracking
+- [x] File and image item creation flow
+- [x] Display uploaded files/images in item detail
+- [x] Delete file from R2 on item delete
 
 ### 18. AI Features (Anthropic Claude Haiku)
 - [ ] Auto-tag suggestions on item create/edit
