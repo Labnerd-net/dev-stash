@@ -11,12 +11,11 @@ interface DeleteItemButtonProps {
 
 export function DeleteItemButton({ id, onSuccess }: DeleteItemButtonProps) {
   const [isPending, startTransition] = useTransition();
+  const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function handleDelete() {
-    if (!window.confirm("Delete this item? This cannot be undone.")) return;
+  function handleConfirm() {
     setError(null);
-
     const formData = new FormData();
     formData.append("id", id);
 
@@ -25,9 +24,37 @@ export function DeleteItemButton({ id, onSuccess }: DeleteItemButtonProps) {
       if (result.success) {
         onSuccess();
       } else {
+        setConfirming(false);
         setError(result.error ?? "Failed to delete item");
       }
     });
+  }
+
+  if (confirming) {
+    return (
+      <div className="flex flex-col items-end gap-1">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground">Sure?</span>
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={isPending}
+            onClick={handleConfirm}
+          >
+            {isPending ? "Deleting…" : "Yes, delete"}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={isPending}
+            onClick={() => setConfirming(false)}
+          >
+            Cancel
+          </Button>
+        </div>
+        {error && <p className="text-xs text-destructive">{error}</p>}
+      </div>
+    );
   }
 
   return (
@@ -35,10 +62,9 @@ export function DeleteItemButton({ id, onSuccess }: DeleteItemButtonProps) {
       <Button
         variant="destructive"
         size="sm"
-        disabled={isPending}
-        onClick={handleDelete}
+        onClick={() => setConfirming(true)}
       >
-        {isPending ? "Deleting…" : "Delete"}
+        Delete
       </Button>
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
