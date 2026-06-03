@@ -57,6 +57,9 @@ export default async function EditItemPage({ params }: Props) {
           url: item.url ?? undefined,
           description: item.description ?? undefined,
           language: item.language ?? undefined,
+          fileUrl: item.fileUrl,
+          fileName: item.fileName,
+          fileSize: item.fileSize,
         }}
         collections={userCollections}
         initialCollectionIds={itemCollectionsList.map((c) => c.id)}

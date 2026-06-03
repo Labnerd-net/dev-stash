@@ -16,14 +16,15 @@ export const TYPE_FIELD_CONFIG: Record<string, {
   hasContent: boolean;
   hasLanguage: boolean;
   hasUrl: boolean;
+  hasFile: boolean;
 }> = {
-  system_snippet: { hasContent: true,  hasLanguage: true,  hasUrl: false },
-  system_prompt:  { hasContent: true,  hasLanguage: false, hasUrl: false },
-  system_note:    { hasContent: true,  hasLanguage: false, hasUrl: false },
-  system_command: { hasContent: true,  hasLanguage: false, hasUrl: false },
-  system_file:    { hasContent: false, hasLanguage: false, hasUrl: false },
-  system_image:   { hasContent: false, hasLanguage: false, hasUrl: false },
-  system_url:     { hasContent: false, hasLanguage: false, hasUrl: true  },
+  system_snippet: { hasContent: true,  hasLanguage: true,  hasUrl: false, hasFile: false },
+  system_prompt:  { hasContent: true,  hasLanguage: false, hasUrl: false, hasFile: false },
+  system_note:    { hasContent: true,  hasLanguage: false, hasUrl: false, hasFile: false },
+  system_command: { hasContent: true,  hasLanguage: false, hasUrl: false, hasFile: false },
+  system_file:    { hasContent: false, hasLanguage: false, hasUrl: false, hasFile: true  },
+  system_image:   { hasContent: false, hasLanguage: false, hasUrl: false, hasFile: true  },
+  system_url:     { hasContent: false, hasLanguage: false, hasUrl: true,  hasFile: false },
 };
 
 export const COMMON_LANGUAGES = [

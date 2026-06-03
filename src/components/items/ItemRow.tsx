@@ -32,8 +32,22 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 function getPreview(row: ItemWithType): string {
   const { item } = row;
+  if (item.typeId === "system_file" || item.typeId === "system_image") {
+    if (item.fileName) {
+      return item.fileSize != null
+        ? `${item.fileName} (${formatBytes(item.fileSize)})`
+        : item.fileName;
+    }
+    return item.description ?? "";
+  }
   let text = item.content ?? item.url ?? item.description ?? "";
   if (item.typeId === "system_note" && text.includes("<")) {
     text = stripHtml(text);

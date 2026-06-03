@@ -28,6 +28,10 @@
 			// You can change the bucket name if you want
 			// See https://developers.cloudflare.com/workers/wrangler/commands/#r2-bucket-create
 			"bucket_name": "dev-stash-opennext-cache"
+		},
+		{
+			"bucket_name": "dev-stash-files",
+			"binding": "dev_stash_files"
 		}
 	],
 	"images": {

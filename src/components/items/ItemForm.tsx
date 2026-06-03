@@ -12,6 +12,16 @@ import { COMMON_LANGUAGES, TYPE_FIELD_CONFIG } from "@/lib/item-type-map";
 import { createItem, updateItem } from "@/actions/items";
 import type { CreateItemInput } from "@/lib/item-schemas";
 
+const MAX_SIZE = 25 * 1024 * 1024;
+
+type UploadState = "idle" | "uploading" | "done" | "error";
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 const CODE_TYPE_IDS = ["system_snippet", "system_command", "system_prompt"];
 const NOTE_TYPE_IDS = ["system_note"];
 
@@ -25,7 +35,7 @@ interface ItemType {
 interface ItemFormProps {
   mode: "create" | "edit";
   types: ItemType[];
-  initialValues?: Partial<CreateItemInput & { id: string }>;
+  initialValues?: Partial<CreateItemInput & { id: string; fileUrl?: string | null; fileName?: string | null; fileSize?: number | null }>;
   defaultTypeId?: string;
   collections?: { id: string; name: string }[];
   initialCollectionIds?: string[];
@@ -43,12 +53,75 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
   );
   const [contentValue, setContentValue] = useState(initialValues?.content ?? "");
   const [selectedLanguage, setSelectedLanguage] = useState(initialValues?.language ?? "");
+  const [uploadState, setUploadState] = useState<UploadState>("idle");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [fileKey, setFileKey] = useState<string | null>(initialValues?.fileUrl ?? null);
+  const [fileName, setFileName] = useState<string | null>(initialValues?.fileName ?? null);
+  const [fileSize, setFileSize] = useState<number | null>(initialValues?.fileSize ?? null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
   const fieldConfig = TYPE_FIELD_CONFIG[selectedTypeId] ?? {
     hasContent: false,
     hasLanguage: false,
     hasUrl: false,
+    hasFile: false,
   };
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_SIZE) {
+      setUploadError("File exceeds 25 MB limit");
+      e.target.value = "";
+      return;
+    }
+    if (selectedTypeId === "system_image" && !file.type.startsWith("image/")) {
+      setUploadError("Only image files are allowed for this type");
+      e.target.value = "";
+      return;
+    }
+
+    setUploadError(null);
+    setUploadState("uploading");
+    setUploadProgress(0);
+
+    if (selectedTypeId === "system_image") {
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+      setImagePreviewUrl(URL.createObjectURL(file));
+    }
+
+    const data = new FormData();
+    data.append("file", file);
+    data.append("typeId", selectedTypeId);
+
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = (ev) => {
+      if (ev.lengthComputable) {
+        setUploadProgress(Math.round((ev.loaded / ev.total) * 100));
+      }
+    };
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        const res = JSON.parse(xhr.responseText) as { key: string; fileName: string; fileSize: number };
+        setFileKey(res.key);
+        setFileName(res.fileName);
+        setFileSize(res.fileSize);
+        setUploadState("done");
+      } else {
+        const res = JSON.parse(xhr.responseText) as { error?: string };
+        setUploadError(res.error ?? "Upload failed");
+        setUploadState("error");
+      }
+    };
+    xhr.onerror = () => {
+      setUploadError("Upload failed — network error");
+      setUploadState("error");
+    };
+    xhr.open("POST", "/api/upload");
+    xhr.send(data);
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -171,6 +244,67 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
         </div>
       )}
 
+      {fieldConfig.hasFile && (
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">
+            File {mode === "create" && <span className="text-destructive">*</span>}
+          </label>
+
+          {mode === "edit" && fileKey && uploadState === "idle" && (
+            <p className="text-xs text-muted-foreground">
+              Current file: <span className="font-mono">{fileName ?? fileKey}</span>
+              {fileSize != null && ` (${formatBytes(fileSize)})`}
+              {" — select a new file to replace it"}
+            </p>
+          )}
+
+          <input
+            type="file"
+            accept={selectedTypeId === "system_image" ? "image/*" : undefined}
+            onChange={handleFileChange}
+            disabled={uploadState === "uploading"}
+            className={`${inputClass} cursor-pointer file:mr-3 file:rounded file:border-0 file:bg-muted file:px-2 file:py-1 file:text-xs file:text-foreground`}
+          />
+
+          {uploadState === "uploading" && (
+            <div className="space-y-1">
+              <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-150"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">Uploading… {uploadProgress}%</p>
+            </div>
+          )}
+
+          {uploadState === "done" && imagePreviewUrl && (
+            <img
+              src={imagePreviewUrl}
+              alt="Preview"
+              className="max-h-48 rounded-lg border border-border object-contain"
+            />
+          )}
+
+          {uploadState === "done" && fileName && (
+            <p className="text-xs text-green-500">
+              {fileName}{fileSize != null && ` (${formatBytes(fileSize)})`} — ready
+            </p>
+          )}
+
+          {uploadError && (
+            <p className="text-xs text-destructive">{uploadError}</p>
+          )}
+
+          {fileKey && <input type="hidden" name="fileKey" value={fileKey} />}
+          {fileName && <input type="hidden" name="fileName" value={fileName} />}
+          {fileSize != null && <input type="hidden" name="fileSize" value={fileSize} />}
+          {mode === "edit" && initialValues?.fileUrl && (
+            <input type="hidden" name="oldFileKey" value={initialValues.fileUrl} />
+          )}
+        </div>
+      )}
+
       <div className="space-y-1.5">
         <label htmlFor="description" className="text-sm font-medium">
           Description <span className="text-muted-foreground text-xs">(optional)</span>
@@ -202,7 +336,7 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
       )}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" disabled={isPending || uploadState === "uploading"}>
           {isPending
             ? mode === "create" ? "Creating…" : "Saving…"
             : mode === "create" ? "Create Item" : "Save Changes"}

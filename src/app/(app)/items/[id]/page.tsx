@@ -16,6 +16,12 @@ import { RecentlyUsedTracker } from "@/components/items/RecentlyUsedTracker";
 
 const CODE_TYPE_IDS = new Set(["system_snippet", "system_command", "system_prompt"]);
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 interface Props {
   params: Promise<{ id: string }>;
 }
@@ -111,6 +117,45 @@ export default async function ItemDetailPage({ params }: Props) {
             <pre className="rounded-lg border border-border bg-muted p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-words">
               {item.content}
             </pre>
+          )}
+        </div>
+      )}
+
+      {fieldConfig.hasFile && item.fileUrl && (
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">File</p>
+          {item.typeId === "system_image" ? (
+            <div className="space-y-2">
+              <img
+                src={`/api/files/${item.id}`}
+                alt={item.fileName ?? item.title}
+                className="max-w-full rounded-lg border border-border"
+              />
+              <a
+                href={`/api/files/${item.id}`}
+                download={item.fileName ?? true}
+                className="text-sm text-primary hover:underline"
+              >
+                Download {item.fileName ?? "image"}
+                {item.fileSize != null && ` (${formatBytes(item.fileSize)})`}
+              </a>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 rounded-lg border border-border bg-muted p-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium truncate">{item.fileName ?? "File"}</p>
+                {item.fileSize != null && (
+                  <p className="text-xs text-muted-foreground">{formatBytes(item.fileSize)}</p>
+                )}
+              </div>
+              <a
+                href={`/api/files/${item.id}`}
+                download={item.fileName ?? true}
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
+                Download
+              </a>
+            </div>
           )}
         </div>
       )}
