@@ -126,11 +126,11 @@ Everything else depends on this phase being solid before moving on.
 - [x] Delete file from R2 on item delete
 
 ### 18. AI Features (Anthropic Claude Haiku)
-- [ ] Auto-tag suggestions on item create/edit
-- [ ] AI summary for text items
-- [ ] Explain This Code for snippet/command items
-- [ ] Prompt optimizer for prompt items
-- [ ] Loading states and error handling for all AI actions
+- [x] Auto-tag suggestions on item create/edit
+- [x] AI summary for text items
+- [x] Explain This Code for snippet/command items
+- [x] Prompt optimizer for prompt items
+- [x] Loading states and error handling for all AI actions
 
 ### 19. Search Enhancements
 - [ ] Live results dropdown in header (debounced, keyboard-navigable)
