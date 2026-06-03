@@ -5,9 +5,11 @@ import { useRef, useState } from "react";
 interface TagSelectorProps {
   userTags: { id: string; name: string }[];
   initialTagNames?: string[];
+  suggestedTags?: string[];
+  onSuggestionAccepted?: (tag: string) => void;
 }
 
-export function TagSelector({ userTags, initialTagNames = [] }: TagSelectorProps) {
+export function TagSelector({ userTags, initialTagNames = [], suggestedTags, onSuggestionAccepted }: TagSelectorProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>(initialTagNames);
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -118,6 +120,25 @@ export function TagSelector({ userTags, initialTagNames = [] }: TagSelectorProps
       <p className="text-xs text-muted-foreground">
         Press Enter or comma to add. Separate multiple tags.
       </p>
+
+      {suggestedTags && suggestedTags.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-xs text-muted-foreground">Suggestions:</span>
+          {suggestedTags.map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => {
+                addTag(tag);
+                onSuggestionAccepted?.(tag);
+              }}
+              className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              + {tag}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

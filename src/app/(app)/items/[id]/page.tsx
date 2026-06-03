@@ -13,6 +13,9 @@ import { FavoriteItemButton } from "@/components/items/FavoriteItemButton";
 import { PinItemButton } from "@/components/items/PinItemButton";
 import { CopyButton } from "@/components/items/CopyButton";
 import { RecentlyUsedTracker } from "@/components/items/RecentlyUsedTracker";
+import { AiCodeExplainer } from "@/components/items/AiCodeExplainer";
+import { AiSummary } from "@/components/items/AiSummary";
+import { AiPromptOptimizer } from "@/components/items/AiPromptOptimizer";
 
 const CODE_TYPE_IDS = new Set(["system_snippet", "system_command", "system_prompt"]);
 
@@ -158,6 +161,19 @@ export default async function ItemDetailPage({ params }: Props) {
             </div>
           )}
         </div>
+      )}
+
+      {(item.typeId === "system_snippet" || item.typeId === "system_command") && (
+        <AiCodeExplainer itemId={item.id} />
+      )}
+      {item.typeId === "system_note" && (
+        <AiSummary itemId={item.id} />
+      )}
+      {item.typeId === "system_prompt" && (
+        <>
+          <AiSummary itemId={item.id} />
+          <AiPromptOptimizer itemId={item.id} />
+        </>
       )}
 
       {itemTagNames.length > 0 && (
