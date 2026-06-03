@@ -2,13 +2,13 @@
 
 ## Current Feature Spec File
 
-Title:
-Spec file:
-Branch:
+Title: AI Features with Claude Haiku
+Spec file: context/specs/ai-features.md
+Branch: claude/feature/ai-features
 
 ## Current Feature Plan File
 
-Plan file:
+Plan file: context/features/ai-features.md
 
 ## History
 

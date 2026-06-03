@@ -10,6 +10,7 @@ import { CodeMirrorEditor } from "./CodeMirrorEditor";
 import { TipTapEditor } from "./TipTapEditor";
 import { COMMON_LANGUAGES, TYPE_FIELD_CONFIG } from "@/lib/item-type-map";
 import { createItem, updateItem } from "@/actions/items";
+import { suggestTagsFromContent } from "@/actions/ai";
 import type { CreateItemInput } from "@/lib/item-schemas";
 
 const MAX_SIZE = 25 * 1024 * 1024;
@@ -53,6 +54,9 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
   );
   const [contentValue, setContentValue] = useState(initialValues?.content ?? "");
   const [selectedLanguage, setSelectedLanguage] = useState(initialValues?.language ?? "");
+  const [aiTagSuggestions, setAiTagSuggestions] = useState<string[]>([]);
+  const [isTagsPending, startTagsTransition] = useTransition();
+  const [tagsAiError, setTagsAiError] = useState<string | null>(null);
   const [uploadState, setUploadState] = useState<UploadState>("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -323,10 +327,45 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
         />
       </div>
 
-      <TagSelector
-        userTags={userTags ?? []}
-        initialTagNames={initialTagNames}
-      />
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <span />
+          <button
+            type="button"
+            disabled={isTagsPending || !contentValue && !initialValues?.title}
+            onClick={() => {
+              setTagsAiError(null);
+              const titleEl = formRef.current?.elements.namedItem("title") as HTMLInputElement | null;
+              const title = titleEl?.value ?? initialValues?.title ?? "";
+              if (!title.trim()) return;
+              startTagsTransition(async () => {
+                const result = await suggestTagsFromContent({
+                  title,
+                  content: contentValue,
+                  typeId: selectedTypeId,
+                });
+                if (result.success && result.data) {
+                  setAiTagSuggestions(result.data);
+                } else {
+                  setTagsAiError(result.error ?? "Failed to suggest tags");
+                }
+              });
+            }}
+            className="text-xs text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
+          >
+            {isTagsPending ? "Suggesting…" : "✨ Suggest tags"}
+          </button>
+        </div>
+        <TagSelector
+          userTags={userTags ?? []}
+          initialTagNames={initialTagNames}
+          suggestedTags={aiTagSuggestions}
+          onSuggestionAccepted={(tag) =>
+            setAiTagSuggestions((prev) => prev.filter((t) => t !== tag))
+          }
+        />
+        {tagsAiError && <p className="text-xs text-destructive">{tagsAiError}</p>}
+      </div>
 
       {collections && collections.length > 0 && (
         <CollectionSelector
