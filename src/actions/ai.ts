@@ -20,32 +20,6 @@ function buildItemContext(item: {
   return parts.join("\n\n");
 }
 
-export async function suggestTags(itemId: string): Promise<AiResult<string[]>> {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return { success: false, error: "Unauthorized" };
-
-  const row = await getItemById(itemId, session.user.id);
-  if (!row) return { success: false, error: "Item not found" };
-
-  const { item } = row;
-  const context = buildItemContext(item);
-
-  try {
-    const result = await callHaiku(
-      "You are a tagging assistant for a developer knowledge base. Given an item's details, suggest 3 to 6 short, relevant tags. Return ONLY the tags as a comma-separated list on a single line, lowercase, no punctuation. Example: javascript, react, hooks, performance",
-      context
-    );
-    const tags = result
-      .split(/[,\n]/)
-      .map((t) => t.trim().toLowerCase().replace(/[^a-z0-9-]/g, ""))
-      .filter((t) => t.length > 0 && t.length <= 50)
-      .slice(0, 6);
-    return { success: true, data: tags };
-  } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : "AI request failed" };
-  }
-}
-
 export async function suggestTagsFromContent(input: {
   title: string;
   content: string;

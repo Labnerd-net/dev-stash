@@ -332,7 +332,7 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
           <span />
           <button
             type="button"
-            disabled={isTagsPending || !contentValue && !initialValues?.title}
+            disabled={isTagsPending}
             onClick={() => {
               setTagsAiError(null);
               const titleEl = formRef.current?.elements.namedItem("title") as HTMLInputElement | null;

@@ -60,6 +60,15 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - `deleteItem` fetches `fileUrl` before deleting the row, then deletes the R2 object; R2 failures are non-fatal (caught and ignored)
 - `TYPE_FIELD_CONFIG` has `hasFile: boolean` — true for `system_file` and `system_image`; drives form and detail page conditionals
 
+## AI Features
+
+- Anthropic utility: `src/lib/anthropic.ts` — `callHaiku(systemPrompt, userContent)` uses native fetch; reads `ANTHROPIC_API_KEY` from `getCloudflareContext().env`; truncates content to 4000 chars; model `claude-haiku-4-5-20251001`
+- Server actions: `src/actions/ai.ts` — `suggestTagsFromContent`, `explainCode`, `summarizeItem`, `optimizePrompt`; all require session + ownership check; all return `{ success, data?, error? }`
+- All AI results are ephemeral — nothing is persisted to the database
+- `ANTHROPIC_API_KEY` must be set as a Cloudflare Worker secret: `wrangler secret put ANTHROPIC_API_KEY`
+- UI components: `AiCodeExplainer`, `AiSummary`, `AiPromptOptimizer` in `src/components/items/` — client components with loading/error states
+- `TagSelector` accepts `suggestedTags?: string[]` and `onSuggestionAccepted?: (tag: string) => void` for AI-driven tag chips
+
 ## Auth
 
 - Auth is handled by **better-auth** (`src/lib/auth.ts`) with the Drizzle adapter (`usePlural: true`)

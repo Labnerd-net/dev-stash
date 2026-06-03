@@ -2,13 +2,13 @@
 
 ## Current Feature Spec File
 
-Title: AI Features with Claude Haiku
-Spec file: context/specs/ai-features.md
-Branch: claude/feature/ai-features
+Title:
+Spec file:
+Branch:
 
 ## Current Feature Plan File
 
-Plan file: context/features/ai-features.md
+Plan file:
 
 ## History
 
@@ -31,3 +31,4 @@ Plan file: context/features/ai-features.md
 - Neon Postgres Migration: swapped pg Pool + drizzle-orm/node-postgres for @neondatabase/serverless + drizzle-orm/neon-http; drizzle.config.ts updated to use DATABASE_URL_UNPOOLED for migrations; data migrated from Dokploy Postgres to Neon; both DATABASE_URL (pooled) and DATABASE_URL_UNPOOLED (direct) required in environment
 - Cloudflare Workers Migration: added @opennextjs/cloudflare with wrangler.jsonc and open-next.config.ts; renamed proxy.ts → middleware.ts for edge runtime; rewrote shiki.ts to use fine-grained bundle + JS regex engine (no WASM); lazy-initialized db connection to avoid build-time failures; removed pg dependency; upgraded Next.js to 16.2.6; build command is `npm run build:worker`, deploy is `npm run deploy`
 - File Uploads via Cloudflare R2: R2 bucket binding (`dev_stash_files`) in wrangler.jsonc + CloudflareEnv type in worker-configuration.d.ts; POST `/api/upload` route (Edge) validates size ≤25 MB and MIME type, writes to R2 keyed as `uploads/<userId>/<uuid>-<filename>`; GET `/api/files/[id]` route (Edge) checks ownership and streams from R2 with correct Content-Type/Content-Disposition; `hasFile` added to TYPE_FIELD_CONFIG for system_file and system_image; createItem/updateItem/deleteItem extended to store file metadata (fileUrl key, fileName, fileSize), replace old R2 objects on edit, and delete R2 objects on item delete; ItemForm adds file picker with XHR progress bar and client-side image preview (URL.createObjectURL); item detail page renders image inline or file download card; ItemRow shows fileName+size as preview for file/image types
+- AI Features with Claude Haiku: callHaiku() utility in src/lib/anthropic.ts using native fetch with 4000 char truncation and ANTHROPIC_API_KEY from CloudflareEnv; four server actions in src/actions/ai.ts (suggestTagsFromContent, explainCode, summarizeItem, optimizePrompt); TagSelector extended with suggestedTags/onSuggestionAccepted props to render AI suggestion chips; ItemForm adds "✨ Suggest tags" button that calls suggestTagsFromContent and feeds results into TagSelector; AiCodeExplainer on snippet/command detail pages; AiSummary on note/prompt detail pages; AiPromptOptimizer on prompt detail pages with CopyButton; all results ephemeral (no DB writes); ANTHROPIC_API_KEY required as wrangler secret
