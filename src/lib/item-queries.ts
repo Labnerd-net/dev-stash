@@ -42,6 +42,20 @@ export async function getItemsByIds(userId: string, ids: string[]): Promise<Item
   return rows.sort((a, b) => (indexMap.get(a.item.id) ?? 0) - (indexMap.get(b.item.id) ?? 0));
 }
 
+export async function getAllItemsForExport(userId: string) {
+  return db
+    .select({
+      item: items,
+      typeName: itemTypes.name,
+    })
+    .from(items)
+    .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
+    .where(eq(items.userId, userId))
+    .orderBy(desc(items.createdAt));
+}
+
+export type ItemForExport = Awaited<ReturnType<typeof getAllItemsForExport>>[number];
+
 export async function searchItems(
   userId: string,
   query: string,

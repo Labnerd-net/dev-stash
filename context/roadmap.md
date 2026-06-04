@@ -136,10 +136,10 @@ Everything else depends on this phase being solid before moving on.
 - [ ] Live results dropdown in header (debounced, keyboard-navigable)
 
 ### 20. Export
-- [ ] Export all items as JSON
-- [ ] Export all items as Markdown (one file per item or combined)
-- [ ] Export single collection
-- [ ] Download trigger from UI
+- [x] Export all items as JSON
+- [x] Export all items as Markdown (one file per item or combined)
+- [x] Export single collection
+- [x] Download trigger from UI
 
 ### 21. Keyboard Shortcuts
 - [ ] Cmd+K command palette (search + quick actions)

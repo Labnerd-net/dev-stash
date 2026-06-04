@@ -42,6 +42,20 @@ export default async function CollectionDetailPage({ params }: Props) {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <FavoriteCollectionButton collectionId={collection.id} isFavorite={collection.isFavorite} />
+          <a
+            href={`/api/export/collections/${collection.id}?format=json`}
+            download
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
+            JSON
+          </a>
+          <a
+            href={`/api/export/collections/${collection.id}?format=zip`}
+            download
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
+            Markdown
+          </a>
           <Link
             href={`/collections/${collection.id}/edit`}
             className={buttonVariants({ variant: "outline", size: "sm" })}
