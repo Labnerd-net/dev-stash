@@ -5,8 +5,6 @@ import { getTagsForItems } from "@/lib/tag-queries";
 import { buildJsonExport, buildMarkdownForItem, itemSlug } from "@/lib/export";
 import { zipSync, strToU8 } from "fflate";
 
-export const runtime = "edge";
-
 interface Props {
   params: Promise<{ id: string }>;
 }
