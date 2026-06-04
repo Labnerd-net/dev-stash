@@ -11,6 +11,7 @@ import {
   Image,
   Link as LinkIcon,
   Heart,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ const navItems = [
   { label: "Files", href: "/files", icon: File },
   { label: "Images", href: "/images", icon: Image },
   { label: "Links", href: "/links", icon: LinkIcon },
+  { label: "Settings", href: "/settings", icon: Settings },
 ];
 
 export function SidebarNav() {
