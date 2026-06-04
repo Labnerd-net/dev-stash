@@ -16,6 +16,8 @@ import { RecentlyUsedTracker } from "@/components/items/RecentlyUsedTracker";
 import { AiCodeExplainer } from "@/components/items/AiCodeExplainer";
 import { AiSummary } from "@/components/items/AiSummary";
 import { AiPromptOptimizer } from "@/components/items/AiPromptOptimizer";
+import { TextFilePreview } from "@/components/items/TextFilePreview";
+import { isTextFile } from "@/lib/text-file";
 
 const CODE_TYPE_IDS = new Set(["system_snippet", "system_command", "system_prompt"]);
 
@@ -144,20 +146,25 @@ export default async function ItemDetailPage({ params }: Props) {
               </a>
             </div>
           ) : (
-            <div className="flex items-center gap-3 rounded-lg border border-border bg-muted p-4">
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium truncate">{item.fileName ?? "File"}</p>
-                {item.fileSize != null && (
-                  <p className="text-xs text-muted-foreground">{formatBytes(item.fileSize)}</p>
-                )}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 rounded-lg border border-border bg-muted p-4">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium truncate">{item.fileName ?? "File"}</p>
+                  {item.fileSize != null && (
+                    <p className="text-xs text-muted-foreground">{formatBytes(item.fileSize)}</p>
+                  )}
+                </div>
+                <a
+                  href={`/api/files/${item.id}`}
+                  download={item.fileName ?? true}
+                  className={buttonVariants({ variant: "outline", size: "sm" })}
+                >
+                  Download
+                </a>
               </div>
-              <a
-                href={`/api/files/${item.id}`}
-                download={item.fileName ?? true}
-                className={buttonVariants({ variant: "outline", size: "sm" })}
-              >
-                Download
-              </a>
+              {isTextFile(item.fileName) && (
+                <TextFilePreview itemId={item.id} fileName={item.fileName ?? "file"} />
+              )}
             </div>
           )}
         </div>
