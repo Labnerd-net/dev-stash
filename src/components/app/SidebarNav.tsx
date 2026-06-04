@@ -24,8 +24,28 @@ const navItems = [
   { label: "Files", href: "/files", icon: File },
   { label: "Images", href: "/images", icon: Image },
   { label: "Links", href: "/links", icon: LinkIcon },
-  { label: "Settings", href: "/settings", icon: Settings },
 ];
+
+export function SidebarSettingsLink() {
+  const pathname = usePathname();
+  const isActive = pathname === "/settings" || pathname.startsWith("/settings/");
+  return (
+    <Link
+      href="/settings"
+      title="Settings"
+      className={cn(
+        "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors",
+        "group-data-[collapsed=true]/sidebar:justify-center group-data-[collapsed=true]/sidebar:px-0",
+        isActive
+          ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+          : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+      )}
+    >
+      <Settings className="size-4 shrink-0" />
+      <span className="group-data-[collapsed=true]/sidebar:hidden">Settings</span>
+    </Link>
+  );
+}
 
 export function SidebarNav() {
   const pathname = usePathname();

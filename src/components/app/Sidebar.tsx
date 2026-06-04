@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { SidebarNav } from "./SidebarNav";
+import { SidebarNav, SidebarSettingsLink } from "./SidebarNav";
 import { SidebarWrapper } from "./SidebarWrapper";
 import { SidebarCloseButton } from "./SidebarCloseButton";
 import { getLatestCollections } from "@/lib/collection-queries";
@@ -64,6 +64,13 @@ export async function Sidebar({ userId }: SidebarProps) {
           ))}
         </div>
       </nav>
+
+      <div className="px-2 py-3 border-t border-sidebar-border">
+        <p className="px-2 mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wider group-data-[collapsed=true]/sidebar:hidden">
+          General
+        </p>
+        <SidebarSettingsLink />
+      </div>
     </SidebarWrapper>
   );
 }
