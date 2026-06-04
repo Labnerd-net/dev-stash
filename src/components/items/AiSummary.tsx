@@ -33,7 +33,7 @@ export function AiSummary({ itemId }: { itemId: string }) {
         </button>
       </div>
       {result && (
-        <p className="text-sm text-muted-foreground leading-relaxed">{result}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{result}</p>
       )}
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>

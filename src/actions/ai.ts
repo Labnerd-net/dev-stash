@@ -60,7 +60,7 @@ export async function explainCode(itemId: string): Promise<AiResult> {
 
   try {
     const result = await callHaiku(
-      "You are a code explainer for developers. Explain what the given code or command does in plain English. Be concise and practical — focus on what it does and why someone would use it. Avoid restating the code itself.",
+      "You are a code explainer for developers. Explain what the given code or command does in plain English. Be concise and practical — focus on what it does and why someone would use it. Avoid restating the code itself. Use plain text only — no markdown, no bold, no bullet points, no headers.",
       `Language: ${item.language ?? "unknown"}\n\n${item.content}`
     );
     return { success: true, data: result };
@@ -82,7 +82,7 @@ export async function summarizeItem(itemId: string): Promise<AiResult> {
 
   try {
     const result = await callHaiku(
-      "You are a summarization assistant. Summarize the given content in 2 to 3 concise sentences. Focus on the key purpose and main points.",
+      "You are a summarization assistant. Summarize the given content in 2 to 3 concise sentences. Focus on the key purpose and main points. Use plain text only — no markdown, no bold, no bullet points, no headers.",
       buildItemContext(item)
     );
     return { success: true, data: result };
