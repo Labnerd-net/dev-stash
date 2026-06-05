@@ -253,16 +253,12 @@ export async function deleteItem(formData: FormData): Promise<ActionResult> {
 
   const { id } = parsed.data;
 
-  const existing = await db
-    .select({ fileUrl: items.fileUrl })
-    .from(items)
-    .where(and(eq(items.id, id), eq(items.userId, session.user.id)));
-
-  await db
+  const deleted = await db
     .delete(items)
-    .where(and(eq(items.id, id), eq(items.userId, session.user.id)));
+    .where(and(eq(items.id, id), eq(items.userId, session.user.id)))
+    .returning({ fileUrl: items.fileUrl });
 
-  const fileKey = existing[0]?.fileUrl;
+  const fileKey = deleted[0]?.fileUrl;
   if (fileKey) {
     try {
       const { env } = getCloudflareContext();
