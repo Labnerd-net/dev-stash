@@ -1,9 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 import { toggleItemFavorite } from "@/actions/favorites";
+import { useItemToggle } from "@/hooks/useItemToggle";
 import { cn } from "@/lib/utils";
 
 interface FavoriteItemButtonProps {
@@ -12,20 +11,11 @@ interface FavoriteItemButtonProps {
 }
 
 export function FavoriteItemButton({ itemId, isFavorite }: FavoriteItemButtonProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  function handleClick(e: React.MouseEvent) {
-    e.stopPropagation();
-    startTransition(async () => {
-      await toggleItemFavorite(itemId);
-      router.refresh();
-    });
-  }
+  const { isPending, trigger } = useItemToggle(() => toggleItemFavorite(itemId));
 
   return (
     <button
-      onClick={handleClick}
+      onClick={trigger}
       disabled={isPending}
       className={cn(
         "p-1 rounded transition-colors hover:text-rose-500 disabled:opacity-50",

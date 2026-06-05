@@ -1,8 +1,9 @@
 import { headers } from "next/headers";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { auth } from "@/lib/auth";
+import { MAX_UPLOAD_SIZE } from "@/lib/constants";
 
-const MAX_SIZE = 25 * 1024 * 1024; // 25 MB
+const MAX_SIZE = MAX_UPLOAD_SIZE;
 
 const ALLOWED_IMAGE_TYPES = new Set([
   "image/png",

@@ -1,5 +1,7 @@
+import { MAX_RECENT_ITEMS } from "@/lib/constants";
+
 const RECENTLY_USED_KEY = "recently-used-item-ids";
-const MAX_RECENT = 10;
+const MAX_RECENT = MAX_RECENT_ITEMS;
 
 export function pushRecentItem(id: string): void {
   try {

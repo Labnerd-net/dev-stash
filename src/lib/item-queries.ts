@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { items, itemTypes } from "@/db/schema";
 import { eq, and, or, desc, sql, inArray } from "drizzle-orm";
+import { SEARCH_RESULT_LIMIT } from "@/lib/constants";
 
 export async function getItemsByType(userId: string, typeId: string) {
   return db
@@ -91,5 +92,5 @@ export async function searchItems(
       )
     )
     .orderBy(desc(items.createdAt))
-    .limit(50);
+    .limit(SEARCH_RESULT_LIMIT);
 }

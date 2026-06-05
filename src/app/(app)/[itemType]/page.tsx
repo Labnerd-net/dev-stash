@@ -1,5 +1,5 @@
+import { notFound, redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getItemsByType } from "@/lib/item-queries";
@@ -8,11 +8,19 @@ import { ITEM_TYPE_MAP } from "@/lib/item-type-map";
 import { ItemList } from "@/components/items/ItemList";
 import { buttonVariants } from "@/lib/button-variants";
 
-export default async function ImagesPage() {
+export default async function ItemTypePage({
+  params,
+}: {
+  params: Promise<{ itemType: string }>;
+}) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const { typeId, label, singularLabel } = ITEM_TYPE_MAP.images;
+  const { itemType } = await params;
+  const typeConfig = ITEM_TYPE_MAP[itemType as keyof typeof ITEM_TYPE_MAP];
+  if (!typeConfig) notFound();
+
+  const { typeId, label, singularLabel } = typeConfig;
   const itemList = await getItemsByType(session.user.id, typeId);
   const tagsMap = await getTagsForItems(itemList.map((r) => r.item.id), session.user.id);
 
@@ -22,7 +30,8 @@ export default async function ImagesPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{label}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {itemList.length} {itemList.length === 1 ? singularLabel.toLowerCase() : label.toLowerCase()}
+            {itemList.length}{" "}
+            {itemList.length === 1 ? singularLabel.toLowerCase() : label.toLowerCase()}
           </p>
         </div>
         <Link href="/items/new" className={buttonVariants({ size: "sm" })}>

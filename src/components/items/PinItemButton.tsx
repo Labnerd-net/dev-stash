@@ -1,9 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Pin } from "lucide-react";
 import { toggleItemPin } from "@/actions/favorites";
+import { useItemToggle } from "@/hooks/useItemToggle";
 import { cn } from "@/lib/utils";
 
 interface PinItemButtonProps {
@@ -12,20 +11,11 @@ interface PinItemButtonProps {
 }
 
 export function PinItemButton({ itemId, isPinned }: PinItemButtonProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  function handleClick(e: React.MouseEvent) {
-    e.stopPropagation();
-    startTransition(async () => {
-      await toggleItemPin(itemId);
-      router.refresh();
-    });
-  }
+  const { isPending, trigger } = useItemToggle(() => toggleItemPin(itemId));
 
   return (
     <button
-      onClick={handleClick}
+      onClick={trigger}
       disabled={isPending}
       className={cn(
         "p-1 rounded transition-colors hover:text-amber-500 disabled:opacity-50",

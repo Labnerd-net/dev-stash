@@ -12,16 +12,12 @@ import { COMMON_LANGUAGES, TYPE_FIELD_CONFIG } from "@/lib/item-type-map";
 import { createItem, updateItem } from "@/actions/items";
 import { suggestTagsFromContent } from "@/actions/ai";
 import type { CreateItemInput } from "@/lib/item-schemas";
+import { MAX_UPLOAD_SIZE } from "@/lib/constants";
+import { formatBytes } from "@/lib/html-utils";
 
-const MAX_SIZE = 25 * 1024 * 1024;
+const MAX_SIZE = MAX_UPLOAD_SIZE;
 
 type UploadState = "idle" | "uploading" | "done" | "error";
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 const CODE_TYPE_IDS = ["system_snippet", "system_command", "system_prompt"];
 const NOTE_TYPE_IDS = ["system_note"];
