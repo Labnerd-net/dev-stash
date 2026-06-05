@@ -8,6 +8,7 @@ import { FavoriteItemButton } from "./FavoriteItemButton";
 import { PinItemButton } from "./PinItemButton";
 import { CopyButton } from "./CopyButton";
 import type { ItemWithType } from "@/lib/item-queries";
+import { stripHtml, formatBytes } from "@/lib/html-utils";
 
 interface ItemRowProps {
   row: ItemWithType;
@@ -28,15 +29,6 @@ function getCopyContent(row: ItemWithType): string | null {
   return null;
 }
 
-function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 function getPreview(row: ItemWithType): string {
   const { item } = row;

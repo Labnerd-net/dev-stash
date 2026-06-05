@@ -13,6 +13,7 @@ import {
   deleteItemSchema,
 } from "@/lib/item-schemas";
 import { TYPE_ID_TO_SLUG } from "@/lib/item-type-map";
+import { sanitizeHtml } from "@/lib/html-utils";
 
 type ActionResult = { success: boolean; data?: { id: string }; error?: string };
 
@@ -75,7 +76,11 @@ export async function createItem(formData: FormData): Promise<ActionResult> {
     return { success: false, error: parsed.error.issues[0].message };
   }
 
-  const { title, typeId, content, url, description, language } = parsed.data;
+  const { title, typeId, url, description, language } = parsed.data;
+  const content =
+    typeId === "system_note" && parsed.data.content
+      ? sanitizeHtml(parsed.data.content)
+      : (parsed.data.content ?? null);
   const id = crypto.randomUUID();
 
   const fileKey = formData.get("fileKey") as string | null;
@@ -144,7 +149,11 @@ export async function updateItem(formData: FormData): Promise<ActionResult> {
     return { success: false, error: parsed.error.issues[0].message };
   }
 
-  const { id, title, typeId, content, url, description, language } = parsed.data;
+  const { id, title, typeId, url, description, language } = parsed.data;
+  const content =
+    typeId === "system_note" && parsed.data.content
+      ? sanitizeHtml(parsed.data.content)
+      : (parsed.data.content ?? null);
 
   const newFileKey = formData.get("fileKey") as string | null;
   const oldFileKey = formData.get("oldFileKey") as string | null;

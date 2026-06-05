@@ -1,16 +1,5 @@
 import type { ItemForExport } from "@/lib/item-queries";
-
-export function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/\s+/g, " ")
-    .trim();
-}
+import { stripHtml } from "@/lib/html-utils";
 
 export function itemSlug(title: string): string {
   return title

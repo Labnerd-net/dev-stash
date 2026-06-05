@@ -3,15 +3,11 @@
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { stripHtml } from "@/lib/html-utils";
 
 interface CopyButtonProps {
   content: string | null | undefined;
   className?: string;
-}
-
-function stripHtml(html: string): string {
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  return doc.body.textContent ?? "";
 }
 
 export function CopyButton({ content, className }: CopyButtonProps) {
