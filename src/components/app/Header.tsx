@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "./SidebarContext";
@@ -18,6 +19,7 @@ interface HeaderProps {
 export function Header({ user }: HeaderProps) {
   const router = useRouter();
   const { openMobile } = useSidebar();
+  const { resolvedTheme, setTheme } = useTheme();
 
   async function handleSignOut() {
     await authClient.signOut();
@@ -55,6 +57,13 @@ export function Header({ user }: HeaderProps) {
           New Collection
         </Button>
         <Button size="sm" onClick={() => router.push("/items/new")}>New Item</Button>
+        <button
+          onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+          aria-label="Toggle theme"
+        >
+          {resolvedTheme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+        </button>
         <div className="flex items-center gap-2 pl-2 border-l border-border">
           <span className="text-sm text-muted-foreground">
             {user.name || user.email}

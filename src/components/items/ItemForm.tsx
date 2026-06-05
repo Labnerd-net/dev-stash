@@ -135,6 +135,13 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
     const formData = new FormData(formRef.current);
     formData.set("typeId", selectedTypeId);
 
+    const tagNames = formData.getAll("tagName") as string[];
+    const longTag = tagNames.find((t) => t.trim().length > 50);
+    if (longTag) {
+      setError(`Tag "${longTag.trim().slice(0, 20)}…" exceeds the 50-character limit`);
+      return;
+    }
+
     startTransition(async () => {
       const result = mode === "create"
         ? await createItem(formData)
