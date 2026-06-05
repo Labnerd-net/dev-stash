@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getCollections } from "@/lib/collection-queries";
-import { CollectionGrid } from "@/components/collections/CollectionGrid";
+import { CollectionSearch } from "@/components/collections/CollectionSearch";
 import { buttonVariants } from "@/lib/button-variants";
 
 export default async function CollectionsPage() {
@@ -23,7 +23,7 @@ export default async function CollectionsPage() {
           New Collection
         </Link>
       </div>
-      <CollectionGrid collections={userCollections} />
+      <CollectionSearch collections={userCollections} />
     </div>
   );
 }
