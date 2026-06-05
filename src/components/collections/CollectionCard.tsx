@@ -11,12 +11,14 @@ interface CollectionCardProps {
   };
   itemCount: number;
   dominantColor: string | null;
+  previewTitles?: string[];
 }
 
 export function CollectionCard({
   collection,
   itemCount,
   dominantColor,
+  previewTitles = [],
 }: CollectionCardProps) {
   const accentColor = dominantColor ?? "#888";
 
@@ -48,6 +50,18 @@ export function CollectionCard({
           >
             {collection.description}
           </Link>
+        )}
+        {previewTitles.length > 0 && (
+          <div className="flex flex-wrap gap-1 pt-1">
+            {previewTitles.map((title) => (
+              <span
+                key={title}
+                className="max-w-[12rem] truncate rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground"
+              >
+                {title}
+              </span>
+            ))}
+          </div>
         )}
       </div>
     </div>

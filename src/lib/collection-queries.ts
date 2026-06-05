@@ -42,9 +42,30 @@ export async function getCollections(userId: string) {
     }
   }
 
+  // Query 3: up to 3 most-recently-added item titles per collection
+  const previewRows = await db
+    .select({
+      collectionId: itemCollections.collectionId,
+      title: items.title,
+    })
+    .from(itemCollections)
+    .innerJoin(items, eq(items.id, itemCollections.itemId))
+    .where(inArray(itemCollections.collectionId, collectionIds))
+    .orderBy(desc(itemCollections.addedAt));
+
+  const previewTitlesMap = new Map<string, string[]>();
+  for (const row of previewRows) {
+    const existing = previewTitlesMap.get(row.collectionId) ?? [];
+    if (existing.length < 3) {
+      existing.push(row.title);
+      previewTitlesMap.set(row.collectionId, existing);
+    }
+  }
+
   return rows.map((r) => ({
     ...r,
     dominantColor: dominantColorMap.get(r.collection.id) ?? null,
+    previewTitles: previewTitlesMap.get(r.collection.id) ?? [],
   }));
 }
 

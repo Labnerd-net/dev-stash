@@ -24,6 +24,15 @@ export async function getItemsByType(
   return base;
 }
 
+export async function getItemIdsByType(userId: string, typeId: string): Promise<string[]> {
+  const rows = await db
+    .select({ id: items.id })
+    .from(items)
+    .where(and(eq(items.userId, userId), eq(items.typeId, typeId)))
+    .orderBy(desc(items.isPinned), desc(items.createdAt));
+  return rows.map((r) => r.id);
+}
+
 export async function getFavoriteItems(userId: string) {
   return db
     .select({ item: items, itemType: itemTypes })
