@@ -14,6 +14,7 @@ import {
 } from "@/lib/item-schemas";
 import { TYPE_ID_TO_SLUG } from "@/lib/item-type-map";
 import { sanitizeHtml } from "@/lib/html-utils";
+import { getItemById } from "@/lib/item-queries";
 
 type ActionResult = { success: boolean; data?: { id: string }; error?: string };
 
@@ -270,4 +271,47 @@ export async function deleteItem(formData: FormData): Promise<ActionResult> {
 
   revalidatePath("/");
   return { success: true };
+}
+
+export async function duplicateItem(itemId: string): Promise<ActionResult> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return { success: false, error: "Unauthorized" };
+
+  const row = await getItemById(itemId, session.user.id);
+  if (!row) return { success: false, error: "Not found" };
+  const { item } = row;
+
+  const existingTags = await db
+    .select({ tagId: itemTags.tagId })
+    .from(itemTags)
+    .where(eq(itemTags.itemId, itemId));
+
+  const newId = crypto.randomUUID();
+  await db.insert(items).values({
+    id: newId,
+    title: `Copy of ${item.title}`,
+    typeId: item.typeId,
+    contentType: item.contentType,
+    content: item.content,
+    url: item.url,
+    description: item.description,
+    language: item.language,
+    fileUrl: item.fileUrl,
+    fileName: item.fileName,
+    fileSize: item.fileSize,
+    isFavorite: false,
+    isPinned: false,
+    userId: session.user.id,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  if (existingTags.length > 0) {
+    await db.insert(itemTags).values(
+      existingTags.map(({ tagId }) => ({ itemId: newId, tagId }))
+    );
+  }
+
+  revalidateItemPaths(item.typeId);
+  return { success: true, data: { id: newId } };
 }

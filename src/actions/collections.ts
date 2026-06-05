@@ -189,3 +189,55 @@ export async function removeItemFromCollection(
   revalidatePath(`/collections/${collectionId}/edit`);
   return { success: true };
 }
+
+export async function toggleItemCollection(
+  itemId: string,
+  collectionId: string
+): Promise<ActionResult> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return { success: false, error: "Unauthorized" };
+
+  const [ownedItem, ownedCollection] = await Promise.all([
+    db
+      .select({ id: items.id })
+      .from(items)
+      .where(and(eq(items.id, itemId), eq(items.userId, session.user.id))),
+    db
+      .select({ id: collections.id })
+      .from(collections)
+      .where(and(eq(collections.id, collectionId), eq(collections.userId, session.user.id))),
+  ]);
+
+  if (ownedItem.length === 0 || ownedCollection.length === 0) {
+    return { success: false, error: "Not found" };
+  }
+
+  const existing = await db
+    .select({ itemId: itemCollections.itemId })
+    .from(itemCollections)
+    .where(
+      and(
+        eq(itemCollections.itemId, itemId),
+        eq(itemCollections.collectionId, collectionId)
+      )
+    );
+
+  if (existing.length > 0) {
+    await db
+      .delete(itemCollections)
+      .where(
+        and(
+          eq(itemCollections.itemId, itemId),
+          eq(itemCollections.collectionId, collectionId)
+        )
+      );
+  } else {
+    await db
+      .insert(itemCollections)
+      .values({ itemId, collectionId, addedAt: new Date() });
+  }
+
+  revalidatePath(`/items/${itemId}`);
+  revalidatePath(`/collections/${collectionId}`);
+  return { success: true };
+}

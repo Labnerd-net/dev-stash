@@ -3,7 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getItemById } from "@/lib/item-queries";
-import { getCollectionsForItem } from "@/lib/collection-queries";
+import { getCollectionsForItem, getAllCollectionsForUser } from "@/lib/collection-queries";
 import { getTagsForItem } from "@/lib/tag-queries";
 import { TYPE_ID_TO_SLUG, TYPE_FIELD_CONFIG, ITEM_TYPE_MAP } from "@/lib/item-type-map";
 import { highlightCode } from "@/lib/shiki";
@@ -17,6 +17,8 @@ import { AiCodeExplainer } from "@/components/items/AiCodeExplainer";
 import { AiSummary } from "@/components/items/AiSummary";
 import { AiPromptOptimizer } from "@/components/items/AiPromptOptimizer";
 import { TextFilePreview } from "@/components/items/TextFilePreview";
+import { DuplicateItemButton } from "@/components/items/DuplicateItemButton";
+import { QuickCollectionPicker } from "@/components/items/QuickCollectionPicker";
 import { isTextFile } from "@/lib/text-file";
 
 const CODE_TYPE_IDS = new Set(["system_snippet", "system_command", "system_prompt"]);
@@ -36,10 +38,11 @@ export default async function ItemDetailPage({ params }: Props) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const [row, itemCollectionsList, itemTagNames] = await Promise.all([
+  const [row, itemCollectionsList, itemTagNames, allCollections] = await Promise.all([
     getItemById(id, session.user.id),
     getCollectionsForItem(id, session.user.id),
     getTagsForItem(id, session.user.id),
+    getAllCollectionsForUser(session.user.id),
   ]);
   if (!row) notFound();
 
@@ -77,6 +80,7 @@ export default async function ItemDetailPage({ params }: Props) {
           <CopyButton content={copyContent} />
           <FavoriteItemButton itemId={item.id} isFavorite={item.isFavorite} />
           <PinItemButton itemId={item.id} isPinned={item.isPinned} />
+          <DuplicateItemButton itemId={item.id} />
           <Link
             href={`/items/${item.id}/edit`}
             className={buttonVariants({ variant: "outline", size: "sm" })}
@@ -201,24 +205,11 @@ export default async function ItemDetailPage({ params }: Props) {
         </div>
       )}
 
-      {itemCollectionsList.length > 0 && (
-        <div className="space-y-1">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Collections
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {itemCollectionsList.map((c) => (
-              <Link
-                key={c.id}
-                href={`/collections/${c.id}`}
-                className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {c.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      <QuickCollectionPicker
+        itemId={item.id}
+        allCollections={allCollections}
+        currentCollections={itemCollectionsList}
+      />
 
       <div className="text-xs text-muted-foreground">
         <Link href={`/${typeSlug}`} className="hover:underline">
