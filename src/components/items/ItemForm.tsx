@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ItemTypeSelector } from "./ItemTypeSelector";
@@ -16,6 +16,7 @@ import { MAX_UPLOAD_SIZE } from "@/lib/constants";
 import { formatBytes } from "@/lib/html-utils";
 
 const MAX_SIZE = MAX_UPLOAD_SIZE;
+const DRAFT_KEY = "item-new-draft";
 
 type UploadState = "idle" | "uploading" | "done" | "error";
 
@@ -50,6 +51,9 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
   );
   const [contentValue, setContentValue] = useState(initialValues?.content ?? "");
   const [selectedLanguage, setSelectedLanguage] = useState(initialValues?.language ?? "");
+  const [titleValue, setTitleValue] = useState(initialValues?.title ?? "");
+  const [descriptionValue, setDescriptionValue] = useState(initialValues?.description ?? "");
+  const [urlValue, setUrlValue] = useState(initialValues?.url ?? "");
   const [aiTagSuggestions, setAiTagSuggestions] = useState<string[]>([]);
   const [isTagsPending, startTagsTransition] = useTransition();
   const [tagsAiError, setTagsAiError] = useState<string | null>(null);
@@ -60,6 +64,41 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
   const [fileName, setFileName] = useState<string | null>(initialValues?.fileName ?? null);
   const [fileSize, setFileSize] = useState<number | null>(initialValues?.fileSize ?? null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+
+  // Restore draft on mount (create mode only)
+  useEffect(() => {
+    if (mode !== "create") return;
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (!saved) return;
+      const draft = JSON.parse(saved);
+      if (draft.typeId) setSelectedTypeId(draft.typeId);
+      if (draft.content) setContentValue(draft.content);
+      if (draft.language) setSelectedLanguage(draft.language);
+      if (draft.title) setTitleValue(draft.title);
+      if (draft.description) setDescriptionValue(draft.description);
+      if (draft.url) setUrlValue(draft.url);
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debounced draft save (create mode only)
+  useEffect(() => {
+    if (mode !== "create") return;
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({
+          typeId: selectedTypeId,
+          content: contentValue,
+          language: selectedLanguage,
+          title: titleValue,
+          description: descriptionValue,
+          url: urlValue,
+        }));
+      } catch {}
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [selectedTypeId, contentValue, selectedLanguage, titleValue, descriptionValue, urlValue, mode]);
 
   const fieldConfig = TYPE_FIELD_CONFIG[selectedTypeId] ?? {
     hasContent: false,
@@ -152,6 +191,10 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
         return;
       }
 
+      if (mode === "create") {
+        try { localStorage.removeItem(DRAFT_KEY); } catch {}
+      }
+
       router.push(`/items/${result.data.id}`);
     });
   }
@@ -187,7 +230,8 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
           name="title"
           type="text"
           required
-          defaultValue={initialValues?.title ?? ""}
+          value={titleValue}
+          onChange={(e) => setTitleValue(e.target.value)}
           placeholder="Give it a name"
           className={inputClass}
         />
@@ -248,7 +292,8 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
             id="url"
             name="url"
             type="url"
-            defaultValue={initialValues?.url ?? ""}
+            value={urlValue}
+            onChange={(e) => setUrlValue(e.target.value)}
             placeholder="https://"
             className={inputClass}
           />
@@ -324,7 +369,8 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
           id="description"
           name="description"
           rows={3}
-          defaultValue={initialValues?.description ?? ""}
+          value={descriptionValue}
+          onChange={(e) => setDescriptionValue(e.target.value)}
           placeholder="Add a short description…"
           className={`${inputClass} resize-y`}
         />
@@ -338,12 +384,10 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
             disabled={isTagsPending}
             onClick={() => {
               setTagsAiError(null);
-              const titleEl = formRef.current?.elements.namedItem("title") as HTMLInputElement | null;
-              const title = titleEl?.value ?? initialValues?.title ?? "";
-              if (!title.trim()) return;
+              if (!titleValue.trim()) return;
               startTagsTransition(async () => {
                 const result = await suggestTagsFromContent({
-                  title,
+                  title: titleValue,
                   content: contentValue,
                   typeId: selectedTypeId,
                 });
