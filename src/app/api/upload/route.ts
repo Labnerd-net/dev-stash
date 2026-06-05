@@ -4,6 +4,25 @@ import { auth } from "@/lib/auth";
 
 const MAX_SIZE = 25 * 1024 * 1024; // 25 MB
 
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/gif",
+  "image/webp",
+  "image/avif",
+]);
+
+// Types that can execute or inject scripts when served inline or opened
+const BLOCKED_FILE_TYPES = new Set([
+  "image/svg+xml",
+  "text/html",
+  "application/javascript",
+  "application/x-msdownload",
+  "application/x-executable",
+  "application/x-dosexec",
+  "application/vnd.microsoft.portable-executable",
+]);
+
 function sanitizeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 200);
 }
@@ -27,8 +46,18 @@ export async function POST(request: Request) {
     return Response.json({ error: "File exceeds 25 MB limit" }, { status: 413 });
   }
 
-  if (typeId === "system_image" && !file.type.startsWith("image/")) {
-    return Response.json({ error: "Only image files are allowed for this type" }, { status: 415 });
+  if (typeId === "system_image" && !ALLOWED_IMAGE_TYPES.has(file.type)) {
+    return Response.json(
+      { error: "Only PNG, JPEG, GIF, WebP, and AVIF images are allowed" },
+      { status: 415 }
+    );
+  }
+
+  if (typeId === "system_file" && BLOCKED_FILE_TYPES.has(file.type)) {
+    return Response.json(
+      { error: "This file type is not allowed" },
+      { status: 415 }
+    );
   }
 
   const key = `uploads/${session.user.id}/${crypto.randomUUID()}-${sanitizeFilename(file.name)}`;

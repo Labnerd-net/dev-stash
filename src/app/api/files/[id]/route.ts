@@ -22,9 +22,12 @@ export async function GET(
   if (!object) return Response.json({ error: "File not found" }, { status: 404 });
 
   const contentType = object.httpMetadata?.contentType ?? "application/octet-stream";
-  const disposition = contentType.startsWith("image/")
+
+  // Only serve raster images inline; everything else (including SVG) is a download
+  const INLINE_TYPES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"]);
+  const disposition = INLINE_TYPES.has(contentType)
     ? "inline"
-    : `attachment; filename="${item.fileName ?? "file"}"`;
+    : `attachment; filename*=UTF-8''${encodeURIComponent(item.fileName ?? "file")}`;
 
   return new Response(object.body, {
     headers: {

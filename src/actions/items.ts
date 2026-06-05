@@ -83,6 +83,10 @@ export async function createItem(formData: FormData): Promise<ActionResult> {
   const rawFileSize = formData.get("fileSize") as string | null;
   const isFileType = fileKey != null && fileKey.length > 0;
 
+  if (isFileType && !fileKey!.startsWith(`uploads/${session.user.id}/`)) {
+    return { success: false, error: "Invalid file key" };
+  }
+
   await db.insert(items).values({
     id,
     title,
@@ -147,6 +151,14 @@ export async function updateItem(formData: FormData): Promise<ActionResult> {
   const rawFileName = formData.get("fileName") as string | null;
   const rawFileSize = formData.get("fileSize") as string | null;
   const replacingFile = newFileKey != null && newFileKey.length > 0;
+
+  const expectedPrefix = `uploads/${session.user.id}/`;
+  if (replacingFile && !newFileKey!.startsWith(expectedPrefix)) {
+    return { success: false, error: "Invalid file key" };
+  }
+  if (oldFileKey && oldFileKey.length > 0 && !oldFileKey.startsWith(expectedPrefix)) {
+    return { success: false, error: "Invalid file key" };
+  }
 
   const fileUpdateFields = replacingFile
     ? {
