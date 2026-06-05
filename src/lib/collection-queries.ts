@@ -60,9 +60,10 @@ export async function getCollectionById(id: string, userId: string) {
 
 export async function getCollectionItems(
   collectionId: string,
-  userId: string
+  userId: string,
+  opts: { limit?: number; offset?: number } = {}
 ): Promise<ItemWithType[]> {
-  return db
+  const base = db
     .select({ item: items, itemType: itemTypes })
     .from(itemCollections)
     .innerJoin(items, eq(items.id, itemCollections.itemId))
@@ -75,6 +76,9 @@ export async function getCollectionItems(
       )
     )
     .orderBy(desc(itemCollections.addedAt));
+  const { limit, offset } = opts;
+  if (limit !== undefined) return base.limit(limit).offset(offset ?? 0);
+  return base;
 }
 
 export async function getLatestCollections(userId: string, limit = 10) {

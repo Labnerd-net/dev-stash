@@ -3,13 +3,25 @@ import { items, itemTypes } from "@/db/schema";
 import { eq, and, or, desc, sql, inArray } from "drizzle-orm";
 import { SEARCH_RESULT_LIMIT } from "@/lib/constants";
 
-export async function getItemsByType(userId: string, typeId: string) {
-  return db
+export type ItemWithType = {
+  item: typeof items.$inferSelect;
+  itemType: typeof itemTypes.$inferSelect;
+};
+
+export async function getItemsByType(
+  userId: string,
+  typeId: string,
+  opts: { limit?: number; offset?: number } = {}
+): Promise<ItemWithType[]> {
+  const base = db
     .select({ item: items, itemType: itemTypes })
     .from(items)
     .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
     .where(and(eq(items.userId, userId), eq(items.typeId, typeId)))
     .orderBy(desc(items.isPinned), desc(items.createdAt));
+  const { limit, offset } = opts;
+  if (limit !== undefined) return base.limit(limit).offset(offset ?? 0);
+  return base;
 }
 
 export async function getFavoriteItems(userId: string) {
@@ -29,8 +41,6 @@ export async function getItemById(id: string, userId: string) {
     .where(and(eq(items.id, id), eq(items.userId, userId)));
   return rows[0] ?? null;
 }
-
-export type ItemWithType = Awaited<ReturnType<typeof getItemsByType>>[number];
 
 export async function getItemsByIds(userId: string, ids: string[]): Promise<ItemWithType[]> {
   if (ids.length === 0) return [];
