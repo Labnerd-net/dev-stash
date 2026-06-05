@@ -4,14 +4,18 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getFavoriteItems } from "@/lib/item-queries";
 import { getTagsForItems } from "@/lib/tag-queries";
-import { ItemList } from "@/components/items/ItemList";
+import { BulkItemList } from "@/components/items/BulkItemList";
+import { getAllCollectionsForUser } from "@/lib/collection-queries";
 import { buttonVariants } from "@/lib/button-variants";
 
 export default async function FavoritesPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const itemList = await getFavoriteItems(session.user.id);
+  const [itemList, userCollections] = await Promise.all([
+    getFavoriteItems(session.user.id),
+    getAllCollectionsForUser(session.user.id),
+  ]);
   const tagsMap = await getTagsForItems(itemList.map((r) => r.item.id), session.user.id);
 
   return (
@@ -27,7 +31,7 @@ export default async function FavoritesPage() {
           New Item
         </Link>
       </div>
-      <ItemList items={itemList} label="favorites" tagsMap={tagsMap} />
+      <BulkItemList items={itemList} label="favorites" tagsMap={tagsMap} collections={userCollections} />
     </div>
   );
 }

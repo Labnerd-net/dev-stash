@@ -273,6 +273,116 @@ export async function deleteItem(formData: FormData): Promise<ActionResult> {
   return { success: true };
 }
 
+type BulkResult = { success: boolean; error?: string };
+
+export async function bulkFavoriteItems(ids: string[], isFavorite: boolean): Promise<BulkResult> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return { success: false, error: "Unauthorized" };
+  if (ids.length === 0) return { success: true };
+
+  await db
+    .update(items)
+    .set({ isFavorite, updatedAt: new Date() })
+    .where(and(inArray(items.id, ids), eq(items.userId, session.user.id)));
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
+export async function bulkPinItems(ids: string[], isPinned: boolean): Promise<BulkResult> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return { success: false, error: "Unauthorized" };
+  if (ids.length === 0) return { success: true };
+
+  await db
+    .update(items)
+    .set({ isPinned, updatedAt: new Date() })
+    .where(and(inArray(items.id, ids), eq(items.userId, session.user.id)));
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
+export async function bulkDeleteItems(ids: string[]): Promise<BulkResult> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return { success: false, error: "Unauthorized" };
+  if (ids.length === 0) return { success: true };
+
+  const deleted = await db
+    .delete(items)
+    .where(and(inArray(items.id, ids), eq(items.userId, session.user.id)))
+    .returning({ fileUrl: items.fileUrl });
+
+  const fileKeys = deleted.map((d) => d.fileUrl).filter(Boolean) as string[];
+  if (fileKeys.length > 0) {
+    try {
+      const { env } = getCloudflareContext();
+      await Promise.all(fileKeys.map((key) => env.dev_stash_files.delete(key)));
+    } catch {}
+  }
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
+export async function bulkAddToCollection(
+  itemIds: string[],
+  collectionId: string
+): Promise<BulkResult> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return { success: false, error: "Unauthorized" };
+  if (itemIds.length === 0 || !collectionId) return { success: true };
+
+  const ownedCollection = await db
+    .select({ id: collections.id })
+    .from(collections)
+    .where(and(eq(collections.id, collectionId), eq(collections.userId, session.user.id)));
+  if (ownedCollection.length === 0) return { success: false, error: "Collection not found" };
+
+  const ownedItems = await db
+    .select({ id: items.id })
+    .from(items)
+    .where(and(inArray(items.id, itemIds), eq(items.userId, session.user.id)));
+
+  if (ownedItems.length > 0) {
+    await db
+      .insert(itemCollections)
+      .values(ownedItems.map(({ id }) => ({ itemId: id, collectionId, addedAt: new Date() })))
+      .onConflictDoNothing();
+  }
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
+export async function bulkAddTag(itemIds: string[], tagName: string): Promise<BulkResult> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return { success: false, error: "Unauthorized" };
+  if (itemIds.length === 0 || !tagName.trim()) return { success: true };
+
+  const [normalizedName] = normalizeTagNames([tagName]);
+  if (!normalizedName) return { success: false, error: "Invalid tag name" };
+
+  const ownedItems = await db
+    .select({ id: items.id })
+    .from(items)
+    .where(and(inArray(items.id, itemIds), eq(items.userId, session.user.id)));
+
+  if (ownedItems.length === 0) return { success: true };
+
+  const tagIds = await upsertTags([normalizedName], session.user.id);
+  const tagId = tagIds[0];
+  if (!tagId) return { success: false, error: "Failed to create tag" };
+
+  await db
+    .insert(itemTags)
+    .values(ownedItems.map(({ id }) => ({ itemId: id, tagId })))
+    .onConflictDoNothing();
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
 export async function duplicateItem(itemId: string): Promise<ActionResult> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return { success: false, error: "Unauthorized" };

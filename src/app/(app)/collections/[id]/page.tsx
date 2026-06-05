@@ -5,9 +5,10 @@ import { auth } from "@/lib/auth";
 import {
   getCollectionById,
   getCollectionItems,
+  getAllCollectionsForUser,
 } from "@/lib/collection-queries";
 import { getTagsForItems } from "@/lib/tag-queries";
-import { ItemList } from "@/components/items/ItemList";
+import { BulkItemList } from "@/components/items/BulkItemList";
 import { DeleteCollectionRedirect } from "@/components/collections/DeleteCollectionRedirect";
 import { FavoriteCollectionButton } from "@/components/collections/FavoriteCollectionButton";
 import { buttonVariants } from "@/lib/button-variants";
@@ -27,9 +28,10 @@ export default async function CollectionDetailPage({ params, searchParams }: Pro
   const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
   const offset = (page - 1) * PAGE_SIZE;
 
-  const [collection, raw] = await Promise.all([
+  const [collection, raw, userCollections] = await Promise.all([
     getCollectionById(id, session.user.id),
     getCollectionItems(id, session.user.id, { limit: PAGE_SIZE + 1, offset }),
+    getAllCollectionsForUser(session.user.id),
   ]);
 
   if (!collection) notFound();
@@ -77,7 +79,7 @@ export default async function CollectionDetailPage({ params, searchParams }: Pro
         </div>
       </div>
 
-      <ItemList items={collectionItems} label="items" tagsMap={tagsMap} />
+      <BulkItemList items={collectionItems} label="items" tagsMap={tagsMap} collections={userCollections} />
 
       {(page > 1 || hasNextPage) && (
         <div className="flex items-center justify-between">

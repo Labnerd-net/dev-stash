@@ -13,6 +13,8 @@ import { stripHtml, formatBytes } from "@/lib/html-utils";
 interface ItemRowProps {
   row: ItemWithType;
   tags?: string[];
+  isSelected?: boolean;
+  onToggle?: (id: string) => void;
 }
 
 const COPY_TYPE_IDS = new Set([
@@ -47,14 +49,23 @@ function getPreview(row: ItemWithType): string {
   return text.length > 120 ? text.slice(0, 120) + "…" : text;
 }
 
-export function ItemRow({ row, tags }: ItemRowProps) {
+export function ItemRow({ row, tags, isSelected, onToggle }: ItemRowProps) {
   const router = useRouter();
   const { item, itemType } = row;
   const preview = getPreview(row);
   const copyContent = getCopyContent(row);
 
   return (
-    <li className="group flex items-start justify-between gap-4 px-4 py-3 hover:bg-muted/30 transition-colors">
+    <li className={`group flex items-start justify-between gap-4 px-4 py-3 hover:bg-muted/30 transition-colors${isSelected ? " bg-muted/20" : ""}`}>
+      {onToggle && (
+        <input
+          type="checkbox"
+          checked={isSelected ?? false}
+          onChange={() => onToggle(item.id)}
+          onClick={(e) => e.stopPropagation()}
+          className="mt-1 size-4 shrink-0 cursor-pointer accent-primary"
+        />
+      )}
       <div className="min-w-0 flex-1 space-y-0.5">
         <div className="flex items-center gap-2">
           {item.isPinned && (
