@@ -20,6 +20,11 @@ function buildItemContext(item: {
   return parts.join("\n\n");
 }
 
+// Trade-off: accepts caller-supplied strings directly without tying them to
+// an owned item in the DB. Any authenticated user can send arbitrary content
+// under the app's Anthropic API key. Mitigated by the 4000-char truncation in
+// callHaiku(). Acceptable for a single-user deployment; add per-user rate
+// limiting before opening to multiple untrusted users.
 export async function suggestTagsFromContent(input: {
   title: string;
   content: string;

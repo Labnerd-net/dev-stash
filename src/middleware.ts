@@ -3,6 +3,13 @@ import { getSessionCookie } from "better-auth/cookies";
 
 const PUBLIC_PATHS = ["/sign-in", "/sign-up"];
 
+// Edge middleware runs on the Cloudflare Workers runtime, which does not have
+// access to the database or the signing keys needed for full session validation.
+// `getSessionCookie` checks only for cookie presence, not cryptographic validity.
+// A user with a forged or expired cookie can reach the HTML shell, but every
+// server action and API route performs a full better-auth session check before
+// returning any data, so no private data is exposed. This is an accepted
+// trade-off for Edge-compatible route protection.
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = getSessionCookie(request);
