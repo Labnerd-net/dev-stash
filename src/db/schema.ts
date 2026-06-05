@@ -104,22 +104,29 @@ export const items = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (table) => [index("items_user_id_idx").on(table.userId)]
+  (table) => [
+    index("items_user_id_idx").on(table.userId),
+    index("items_user_id_type_id_idx").on(table.userId, table.typeId),
+  ]
 );
 
 // ─── Collections ──────────────────────────────────────────────────────────────
 
-export const collections = pgTable("collections", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description"),
-  isFavorite: boolean("is_favorite").notNull().default(false),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+export const collections = pgTable(
+  "collections",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    description: text("description"),
+    isFavorite: boolean("is_favorite").notNull().default(false),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (table) => [index("collections_user_id_idx").on(table.userId)]
+);
 
 // ─── Item ↔ Collection (join table) ──────────────────────────────────────────
 
@@ -134,7 +141,10 @@ export const itemCollections = pgTable(
       .references(() => collections.id, { onDelete: "cascade" }),
     addedAt: timestamp("added_at").notNull().defaultNow(),
   },
-  (table) => [primaryKey({ columns: [table.itemId, table.collectionId] })]
+  (table) => [
+    primaryKey({ columns: [table.itemId, table.collectionId] }),
+    index("item_collections_collection_id_idx").on(table.collectionId),
+  ]
 );
 
 // ─── Tags ─────────────────────────────────────────────────────────────────────
@@ -148,7 +158,11 @@ export const tags = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
   },
-  (table) => [unique("tags_user_id_name_unique").on(table.userId, table.name)]
+  (table) => [
+    unique("tags_user_id_name_unique").on(table.userId, table.name),
+    index("tags_user_id_idx").on(table.userId),
+    index("tags_name_idx").on(table.name),
+  ]
 );
 
 // ─── Item ↔ Tag (join table) ──────────────────────────────────────────────────
@@ -163,5 +177,8 @@ export const itemTags = pgTable(
       .notNull()
       .references(() => tags.id, { onDelete: "cascade" }),
   },
-  (table) => [primaryKey({ columns: [table.itemId, table.tagId] })]
+  (table) => [
+    primaryKey({ columns: [table.itemId, table.tagId] }),
+    index("item_tags_item_id_idx").on(table.itemId),
+  ]
 );
