@@ -1,6 +1,41 @@
 import { db } from "@/db";
-import { tags, itemTags } from "@/db/schema";
-import { eq, and, inArray } from "drizzle-orm";
+import { tags, itemTags, items, itemTypes } from "@/db/schema";
+import { eq, and, inArray, desc, sql } from "drizzle-orm";
+
+export async function getTagsWithItemCounts(userId: string, limit?: number) {
+  const rows = await db
+    .select({
+      name: tags.name,
+      count: sql<number>`cast(count(${itemTags.itemId}) as int)`,
+    })
+    .from(tags)
+    .leftJoin(itemTags, eq(itemTags.tagId, tags.id))
+    .where(eq(tags.userId, userId))
+    .groupBy(tags.id, tags.name)
+    .orderBy(desc(sql`count(${itemTags.itemId})`));
+  return limit ? rows.slice(0, limit) : rows;
+}
+
+export async function getItemsByTag(
+  userId: string,
+  tagName: string,
+  typeId?: string
+) {
+  return db
+    .select({ item: items, itemType: itemTypes })
+    .from(items)
+    .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
+    .innerJoin(itemTags, eq(itemTags.itemId, items.id))
+    .innerJoin(tags, eq(tags.id, itemTags.tagId))
+    .where(
+      and(
+        eq(items.userId, userId),
+        eq(tags.name, tagName),
+        typeId ? eq(items.typeId, typeId) : undefined
+      )
+    )
+    .orderBy(desc(items.isPinned), desc(items.createdAt));
+}
 
 export async function getUserTags(userId: string) {
   return db

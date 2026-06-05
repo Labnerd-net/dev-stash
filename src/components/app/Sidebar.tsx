@@ -4,13 +4,17 @@ import { SidebarNav, SidebarSettingsLink } from "./SidebarNav";
 import { SidebarWrapper } from "./SidebarWrapper";
 import { SidebarCloseButton } from "./SidebarCloseButton";
 import { getLatestCollections } from "@/lib/collection-queries";
+import { getTagsWithItemCounts } from "@/lib/tag-queries";
 
 interface SidebarProps {
   userId: string;
 }
 
 export async function Sidebar({ userId }: SidebarProps) {
-  const latestCollections = await getLatestCollections(userId);
+  const [latestCollections, topTags] = await Promise.all([
+    getLatestCollections(userId),
+    getTagsWithItemCounts(userId, 10),
+  ]);
 
   return (
     <SidebarWrapper>
@@ -63,6 +67,24 @@ export async function Sidebar({ userId }: SidebarProps) {
             </Link>
           ))}
         </div>
+
+        {topTags.length > 0 && (
+          <div className="mt-5 group-data-[collapsed=true]/sidebar:hidden">
+            <p className="px-2 mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Tags
+            </p>
+            {topTags.map((t) => (
+              <Link
+                key={t.name}
+                href={`/tags/${encodeURIComponent(t.name)}`}
+                className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
+              >
+                <span className="truncate">{t.name}</span>
+                <span className="ml-2 shrink-0 text-xs text-muted-foreground">{t.count}</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </nav>
 
       <div className="px-2 py-3 border-t border-sidebar-border">
