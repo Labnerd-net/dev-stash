@@ -5,7 +5,8 @@ import { auth } from "@/lib/auth";
 import { getItemsByType } from "@/lib/item-queries";
 import { getTagsForItems } from "@/lib/tag-queries";
 import { ITEM_TYPE_MAP } from "@/lib/item-type-map";
-import { ItemList } from "@/components/items/ItemList";
+import { BulkItemList } from "@/components/items/BulkItemList";
+import { getAllCollectionsForUser } from "@/lib/collection-queries";
 import { buttonVariants } from "@/lib/button-variants";
 import { PAGE_SIZE } from "@/lib/constants";
 
@@ -28,10 +29,10 @@ export default async function ItemTypePage({
   const offset = (page - 1) * PAGE_SIZE;
 
   const { typeId, label, singularLabel } = typeConfig;
-  const raw = await getItemsByType(session.user.id, typeId, {
-    limit: PAGE_SIZE + 1,
-    offset,
-  });
+  const [raw, userCollections] = await Promise.all([
+    getItemsByType(session.user.id, typeId, { limit: PAGE_SIZE + 1, offset }),
+    getAllCollectionsForUser(session.user.id),
+  ]);
 
   const hasNextPage = raw.length > PAGE_SIZE;
   const itemList = hasNextPage ? raw.slice(0, PAGE_SIZE) : raw;
@@ -53,7 +54,7 @@ export default async function ItemTypePage({
           New {singularLabel}
         </Link>
       </div>
-      <ItemList items={itemList} label={label} tagsMap={tagsMap} />
+      <BulkItemList items={itemList} label={label} tagsMap={tagsMap} collections={userCollections} />
       {(page > 1 || hasNextPage) && (
         <div className="flex items-center justify-between pt-2">
           {page > 1 ? (
