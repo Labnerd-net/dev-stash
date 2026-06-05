@@ -163,18 +163,21 @@ export async function removeItemFromCollection(
     return { success: false, error: "Missing itemId or collectionId" };
   }
 
-  // Verify collection ownership before deleting
-  const owned = await db
-    .select({ id: collections.id })
-    .from(collections)
-    .where(
-      and(
-        eq(collections.id, collectionId),
-        eq(collections.userId, session.user.id)
-      )
-    );
+  // Verify ownership of both the collection and the item
+  const [ownedCollection, ownedItem] = await Promise.all([
+    db
+      .select({ id: collections.id })
+      .from(collections)
+      .where(and(eq(collections.id, collectionId), eq(collections.userId, session.user.id))),
+    db
+      .select({ id: items.id })
+      .from(items)
+      .where(and(eq(items.id, itemId), eq(items.userId, session.user.id))),
+  ]);
 
-  if (owned.length === 0) return { success: false, error: "Not found" };
+  if (ownedCollection.length === 0 || ownedItem.length === 0) {
+    return { success: false, error: "Not found" };
+  }
 
   await db
     .delete(itemCollections)

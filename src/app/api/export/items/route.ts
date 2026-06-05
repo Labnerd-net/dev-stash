@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { getAllItemsForExport } from "@/lib/item-queries";
 import { getTagsForItems } from "@/lib/tag-queries";
 import { buildJsonExport, buildMarkdownForItem, itemSlug } from "@/lib/export";
+import { EXPORT_ZIP_ITEM_LIMIT } from "@/lib/constants";
 import { zipSync, strToU8 } from "fflate";
 
 export async function GET(request: Request) {
@@ -19,6 +20,15 @@ export async function GET(request: Request) {
   const date = new Date().toISOString().slice(0, 10);
 
   if (format === "zip") {
+    if (rows.length > EXPORT_ZIP_ITEM_LIMIT) {
+      return new Response(
+        JSON.stringify({
+          error: `ZIP export is limited to ${EXPORT_ZIP_ITEM_LIMIT} items. You have ${rows.length} items. Use JSON export for large datasets.`,
+        }),
+        { status: 413, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     const files: Record<string, Uint8Array> = {};
     const slugCount: Record<string, number> = {};
 
