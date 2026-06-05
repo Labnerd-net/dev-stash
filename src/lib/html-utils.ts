@@ -2,6 +2,11 @@
  * Strip all HTML tags and decode common entities. Server-safe (no DOM APIs).
  * The DOMParser approach is more robust for client components, but this
  * handles the realistic output from TipTap's StarterKit correctly.
+ *
+ * Limitation: regex-based stripping can misparse malformed HTML — e.g. an
+ * attribute value containing `>` like `alt="a>b"` would leave `b">` in the
+ * output. This is acceptable because the output goes to a downloaded Markdown
+ * file, never to rendered HTML. Real-world TipTap output never triggers this.
  */
 export function stripHtml(html: string): string {
   return html
