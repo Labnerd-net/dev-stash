@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { getItemById } from "@/lib/item-queries";
+import { getItemById, getItemIdsByType } from "@/lib/item-queries";
 import { getCollectionsForItem, getAllCollectionsForUser } from "@/lib/collection-queries";
 import { getTagsForItem } from "@/lib/tag-queries";
 import { TYPE_ID_TO_SLUG, TYPE_FIELD_CONFIG, ITEM_TYPE_MAP } from "@/lib/item-type-map";
@@ -45,6 +45,11 @@ export default async function ItemDetailPage({ params }: Props) {
     getAllCollectionsForUser(session.user.id),
   ]);
   if (!row) notFound();
+
+  const siblingIds = await getItemIdsByType(session.user.id, row.item.typeId);
+  const currentIndex = siblingIds.indexOf(id);
+  const prevId = currentIndex > 0 ? siblingIds[currentIndex - 1] : null;
+  const nextId = currentIndex < siblingIds.length - 1 ? siblingIds[currentIndex + 1] : null;
 
   const { item, itemType } = row;
   const fieldConfig = TYPE_FIELD_CONFIG[item.typeId] ?? { hasContent: false, hasLanguage: false, hasUrl: false };
@@ -211,10 +216,24 @@ export default async function ItemDetailPage({ params }: Props) {
         currentCollections={itemCollectionsList}
       />
 
-      <div className="text-xs text-muted-foreground">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
         <Link href={`/${typeSlug}`} className="hover:underline">
           ← Back to {typeLabel}
         </Link>
+        {(prevId || nextId) && (
+          <div className="flex items-center gap-3">
+            {prevId ? (
+              <Link href={`/items/${prevId}`} className="hover:underline">← Prev</Link>
+            ) : (
+              <span className="opacity-30">← Prev</span>
+            )}
+            {nextId ? (
+              <Link href={`/items/${nextId}`} className="hover:underline">Next →</Link>
+            ) : (
+              <span className="opacity-30">Next →</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

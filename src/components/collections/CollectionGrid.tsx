@@ -29,6 +29,7 @@ export function CollectionGrid({ collections }: CollectionGridProps) {
           collection={c.collection}
           itemCount={c.itemCount}
           dominantColor={c.dominantColor}
+          previewTitles={c.previewTitles}
         />
       ))}
     </div>
