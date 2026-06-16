@@ -90,10 +90,12 @@ Everything else depends on this phase being solid before moving on.
 - [x] Pinned items surface at top of list views
 - [x] Favorites filter/view
 
-### 12. Recently Used (localStorage)
+### 12. Recently Used
 - [x] Track last-accessed item IDs in localStorage on open
 - [x] "Recently used" section on dashboard/home view
 - [x] Cap at last 10 items
+- [x] Migrated to DB-backed `user_recently_viewed` table for cross-device history
+- [x] `/recently-used` page showing full history (up to 50 items)
 
 ### 13. Sidebar Enhancements
 - [x] Collapse/expand toggle
@@ -157,3 +159,9 @@ Everything else depends on this phase being solid before moving on.
 - [x] Empty Trash button (clears all trashed records + R2 objects)
 - [x] Lazy 30-day purge on `/trash` page load (no cron required)
 - [x] Trash link in sidebar
+
+### 23. Recently Used DB History
+- [x] Replaced localStorage with `user_recently_viewed` DB table (migration 0006)
+- [x] Upsert-on-view in item detail server component (fire-and-forget)
+- [x] Dashboard section server-rendered (no hydration flicker)
+- [x] `/recently-used` history page (up to 50 items) with "Recent" sidebar link
