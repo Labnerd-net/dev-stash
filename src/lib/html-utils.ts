@@ -20,28 +20,26 @@ export function stripHtml(html: string): string {
     .trim();
 }
 
+// Tags TipTap StarterKit can produce — everything else is stripped.
+const ALLOWED_TAGS = new Set([
+  "p", "h1", "h2", "h3", "h4", "h5", "h6",
+  "ul", "ol", "li", "blockquote", "pre", "code",
+  "strong", "em", "s", "br", "hr",
+]);
+
 /**
- * Sanitize TipTap HTML before storing to the database. Removes script injection
- * vectors while preserving the safe subset of tags StarterKit produces.
- * Works in Cloudflare Workers (pure regex, no DOM APIs).
+ * Sanitize TipTap HTML before storing to the database using an allowlist
+ * approach: strip all attributes, then remove any tag not in ALLOWED_TAGS.
+ * Allowlist is stronger than the previous blocklist and cannot be bypassed
+ * by novel tag names or attribute injection. Works in Cloudflare Workers
+ * (pure regex, no DOM APIs).
  */
 export function sanitizeHtml(html: string): string {
-  // Remove dangerous elements and their entire content
-  html = html.replace(
-    /<(script|style|iframe|object|embed|form|input|textarea|button|select|link|meta|base)\b[^>]*>[\s\S]*?<\/\1>/gi,
-    ""
-  );
-  // Remove self-closing variants of the same dangerous tags
-  html = html.replace(
-    /<(script|style|iframe|object|embed|form|input|textarea|button|select|link|meta|base)\b[^>]*\/?>/gi,
-    ""
-  );
-  // Remove all event handlers (onclick, onerror, onload, etc.)
-  html = html.replace(/\s+on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, "");
-  // Remove javascript: and data: URLs from href/src/action attributes
-  html = html.replace(
-    /(\s+(?:href|src|action)\s*=\s*)(?:"(?:javascript|data):[^"]*"|'(?:javascript|data):[^']*'|(?:javascript|data):[^\s>]*)/gi,
-    ""
+  // Strip all attributes from every tag
+  html = html.replace(/<([a-z][a-z0-9]*)\b[^>]*>/gi, "<$1>");
+  // Remove any tag (opening or closing) not in the allowlist
+  html = html.replace(/<\/?([a-z][a-z0-9]*)\b[^>]*>/gi, (match, tag: string) =>
+    ALLOWED_TAGS.has(tag.toLowerCase()) ? match : ""
   );
   return html;
 }

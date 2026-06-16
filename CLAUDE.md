@@ -172,8 +172,8 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - `items.deletedAt` and `collections.deletedAt` (nullable timestamp) — set on "delete"; null means active
 - **Every** query helper in `item-queries.ts`, `collection-queries.ts`, `tag-queries.ts`, and inline dashboard queries must include `isNull(items.deletedAt)` / `isNull(collections.deletedAt)` — missing one silently surfaces deleted records
 - `deleteItem` / `bulkDeleteItems` / `deleteCollection` in their respective action files soft-delete by setting `deletedAt = new Date()`; R2 file deletion is deferred to permanent delete
-- Trash actions: `src/actions/trash.ts` — `restoreItem`, `restoreCollection`, `permanentDeleteItem`, `permanentDeleteCollection`, `emptyTrash`, `purgeExpiredTrash`
-- `purgeExpiredTrash(userId)` is called at the top of the `/trash` page (server component) before fetching trash lists — lazy 30-day purge, no cron needed
+- Trash actions: `src/actions/trash.ts` — `restoreItem`, `restoreCollection`, `permanentDeleteItem`, `permanentDeleteCollection`, `emptyTrash`
+- `purgeExpiredTrash()` lives in `src/lib/trash-purge.ts` (not a server action — plain async function so it cannot be called from client code); called at the top of the `/trash` page before fetching trash lists — lazy 30-day purge, no cron needed
 - Trash UI components: `src/components/trash/` — `TrashItemRow`, `TrashCollectionRow`, `EmptyTrashButton` (all client components)
 - `/trash` page: `src/app/(app)/trash/page.tsx`; Trash link in `SidebarNav.tsx` uses `Trash2` icon
 

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getTrashedItems } from "@/lib/item-queries";
 import { getTrashedCollections } from "@/lib/collection-queries";
-import { purgeExpiredTrash } from "@/actions/trash";
+import { purgeExpiredTrash } from "@/lib/trash-purge";
 import { TrashItemRow } from "@/components/trash/TrashItemRow";
 import { TrashCollectionRow } from "@/components/trash/TrashCollectionRow";
 import { EmptyTrashButton } from "@/components/trash/EmptyTrashButton";

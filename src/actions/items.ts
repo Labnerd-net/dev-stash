@@ -92,6 +92,11 @@ export async function createItem(formData: FormData): Promise<ActionResult> {
   if (isFileType && !fileKey!.startsWith(`uploads/${session.user.id}/`)) {
     return { success: false, error: "Invalid file key" };
   }
+  if (isFileType) {
+    const { env } = getCloudflareContext();
+    const r2Obj = await env.dev_stash_files.head(fileKey!);
+    if (!r2Obj) return { success: false, error: "File not found — please re-upload" };
+  }
 
   await db.insert(items).values({
     id,
@@ -165,6 +170,11 @@ export async function updateItem(formData: FormData): Promise<ActionResult> {
   const expectedPrefix = `uploads/${session.user.id}/`;
   if (replacingFile && !newFileKey!.startsWith(expectedPrefix)) {
     return { success: false, error: "Invalid file key" };
+  }
+  if (replacingFile) {
+    const { env } = getCloudflareContext();
+    const r2Obj = await env.dev_stash_files.head(newFileKey!);
+    if (!r2Obj) return { success: false, error: "File not found — please re-upload" };
   }
   if (oldFileKey && oldFileKey.length > 0 && !oldFileKey.startsWith(expectedPrefix)) {
     return { success: false, error: "Invalid file key" };
@@ -383,14 +393,14 @@ export async function duplicateItem(itemId: string): Promise<ActionResult> {
     id: newId,
     title: `Copy of ${item.title}`,
     typeId: item.typeId,
-    contentType: item.contentType,
+    contentType: "text",
     content: item.content,
     url: item.url,
     description: item.description,
     language: item.language,
-    fileUrl: item.fileUrl,
-    fileName: item.fileName,
-    fileSize: item.fileSize,
+    fileUrl: null,
+    fileName: null,
+    fileSize: null,
     isFavorite: false,
     isPinned: false,
     userId: session.user.id,
