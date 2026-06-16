@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { getItemById, getAdjacentItemIds } from "@/lib/item-queries";
+import { getItemById, getAdjacentItemIds, getRelatedItems } from "@/lib/item-queries";
 import { getCollectionsForItem, getAllCollectionsForUser } from "@/lib/collection-queries";
 import { getTagsForItem } from "@/lib/tag-queries";
 import { TYPE_ID_TO_SLUG, TYPE_FIELD_CONFIG, ITEM_TYPE_MAP } from "@/lib/item-type-map";
@@ -44,7 +44,10 @@ export default async function ItemDetailPage({ params }: Props) {
   if (!row) notFound();
   void recordItemView(session.user.id, row.item.id).catch(() => {});
 
-  const { prevId, nextId } = await getAdjacentItemIds(session.user.id, row.item.typeId, id);
+  const [{ prevId, nextId }, relatedItems] = await Promise.all([
+    getAdjacentItemIds(session.user.id, row.item.typeId, id),
+    getRelatedItems(id, session.user.id),
+  ]);
 
   const { item, itemType } = row;
   const fieldConfig = TYPE_FIELD_CONFIG[item.typeId] ?? { hasContent: false, hasLanguage: false, hasUrl: false };
@@ -197,6 +200,29 @@ export default async function ItemDetailPage({ params }: Props) {
               </span>
             ))}
           </div>
+        </div>
+      )}
+
+      {relatedItems.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Related</p>
+          <ul className="space-y-1">
+            {relatedItems.map((r) => (
+              <li key={r.item.id} className="flex items-center gap-2">
+                <span
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: getTypeColor(r.itemType.color) }}
+                />
+                <Link
+                  href={`/items/${r.item.id}`}
+                  className="text-sm hover:underline truncate"
+                >
+                  {r.item.title}
+                </Link>
+                <span className="shrink-0 text-xs text-muted-foreground">{r.itemType.name}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 

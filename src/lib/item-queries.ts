@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { items, itemTypes } from "@/db/schema";
-import { eq, and, or, desc, sql, inArray, isNull, isNotNull } from "drizzle-orm";
+import { eq, and, or, desc, sql, inArray, isNull, isNotNull, ne } from "drizzle-orm";
 import { SEARCH_RESULT_LIMIT } from "@/lib/constants";
 
 export type ItemWithType = {
@@ -126,6 +126,32 @@ export async function searchItems(
     )
     .orderBy(desc(items.createdAt))
     .limit(SEARCH_RESULT_LIMIT);
+}
+
+export async function getRelatedItems(
+  itemId: string,
+  userId: string,
+  limit = 5
+): Promise<ItemWithType[]> {
+  return db
+    .selectDistinct({ item: items, itemType: itemTypes })
+    .from(items)
+    .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
+    .where(
+      and(
+        eq(items.userId, userId),
+        isNull(items.deletedAt),
+        ne(items.id, itemId),
+        sql`EXISTS (
+          SELECT 1 FROM item_tags it1
+          JOIN item_tags it2 ON it1.tag_id = it2.tag_id
+          WHERE it1.item_id = ${itemId}
+          AND it2.item_id = ${items.id}
+        )`
+      )
+    )
+    .orderBy(desc(items.createdAt))
+    .limit(limit);
 }
 
 export async function getTrashedItems(userId: string): Promise<ItemWithType[]> {
