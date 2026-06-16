@@ -146,3 +146,14 @@ Everything else depends on this phase being solid before moving on.
 - [x] Cmd+N navigates to /items/new from anywhere (no drawer — uses dedicated page)
 - [x] Cmd+Shift+C navigates to /collections/new from anywhere
 - [x] Item row shortcuts: f = favorite, p = pin, c = copy (fires when row is focused via Tab)
+
+### 22. Soft Delete and Trash
+- [x] `deletedAt` column on items and collections (migration 0005)
+- [x] All delete actions soft-delete instead of hard-deleting
+- [x] All query helpers filter out soft-deleted records
+- [x] `/trash` page listing trashed items and collections
+- [x] Restore individual items and collections from trash
+- [x] Permanent delete from trash (R2 file cleanup for file/image items)
+- [x] Empty Trash button (clears all trashed records + R2 objects)
+- [x] Lazy 30-day purge on `/trash` page load (no cron required)
+- [x] Trash link in sidebar
