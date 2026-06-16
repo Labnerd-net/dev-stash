@@ -6,11 +6,18 @@ import { getCollections } from "@/lib/collection-queries";
 import { CollectionSearch } from "@/components/collections/CollectionSearch";
 import { buttonVariants } from "@/lib/button-variants";
 
-export default async function CollectionsPage() {
+interface CollectionsPageProps {
+  searchParams: Promise<{ q?: string }>;
+}
+
+export default async function CollectionsPage({ searchParams }: CollectionsPageProps) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const userCollections = await getCollections(session.user.id);
+  const { q } = await searchParams;
+  const query = q?.trim() || undefined;
+
+  const userCollections = await getCollections(session.user.id, query);
 
   return (
     <div className="space-y-6">
@@ -18,7 +25,9 @@ export default async function CollectionsPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Collections</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {userCollections.length} {userCollections.length === 1 ? "collection" : "collections"}
+            {query
+              ? `${userCollections.length} result${userCollections.length !== 1 ? "s" : ""} for "${query}"`
+              : `${userCollections.length} ${userCollections.length === 1 ? "collection" : "collections"}`}
           </p>
         </div>
         <Link
@@ -28,7 +37,7 @@ export default async function CollectionsPage() {
           New Collection
         </Link>
       </div>
-      <CollectionSearch collections={userCollections} />
+      <CollectionSearch collections={userCollections} q={query} />
     </div>
   );
 }

@@ -102,7 +102,7 @@ export async function searchItems(
   const textMatch =
     trimmed.length <= 2
       ? sql`${items.title} ILIKE ${likePattern}`
-      : sql`to_tsvector('english', coalesce(${items.title},'') || ' ' || coalesce(${items.content},'') || ' ' || coalesce(${items.description},'')) @@ websearch_to_tsquery('english', ${trimmed})`;
+      : sql`to_tsvector('english', coalesce(${items.title},'') || ' ' || coalesce(${items.content},'') || ' ' || coalesce(${items.description},'') || ' ' || coalesce(${items.language},'')) @@ websearch_to_tsquery('english', ${trimmed})`;
 
   const tagMatch = sql`EXISTS (
     SELECT 1 FROM "item_tags" it

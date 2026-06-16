@@ -50,7 +50,7 @@ _None identified._
 _None identified._
 
 ### Medium
-- **#3 [src/components/collections/CollectionSearch.tsx]**: Collection search is client-side only; state is lost on page refresh and won't scale with large collection sets. Fix: move to URL-based search (`/collections?q=...`) with server-side filtering in `getCollections()`, matching the search page pattern.
+_None identified._
 
 ### Low
 _None identified._
@@ -71,9 +71,8 @@ _None identified._
 - **#11 [src/app/(app)/collections/[id]/]**: No way to duplicate an entire collection. Fix: add a "Duplicate" action on the collection detail page that clones metadata and item memberships.
 - **#12 [future]**: No shareable item links. Items are fully private behind auth. Add an optional public/share toggle per item that generates a token-based read-only URL (e.g. `/share/abc123`).
 - **#13 [src/app/(app)/items/[id]/page.tsx]**: No related items section on detail page. Fix: add a "Related" section querying items that share tags with the current item, limited to 5, excluding the current item.
-- **#14 [future]**: Language field not included in full-text search index. Searching "python" won't match items where `language = "python"`. Fix: add `COALESCE(language, '')` to the `to_tsvector` expression in `searchItems` and regenerate the GIN index.
-- **#15 [future]**: No way to filter collections to favorites-only without browsing the full list. Fix: add a `/collections?filter=favorite` route with a filter chip UI matching the search page type-filter pattern.
-- **#16 [future]**: No Cloudflare KV caching for frequently-read, rarely-changed data (tag lists, collection lists, dashboard stats). On hold — current single-user traffic doesn't justify the complexity.
+- **#14 [future]**: No way to filter collections to favorites-only without browsing the full list. Fix: add a `/collections?filter=favorite` route with a filter chip UI matching the search page type-filter pattern.
+- **#15 [future]**: No Cloudflare KV caching for frequently-read, rarely-changed data (tag lists, collection lists, dashboard stats). On hold — current single-user traffic doesn't justify the complexity.
 
 ---
 
@@ -84,6 +83,6 @@ _None identified._
 | Security | 0 | 0 | 1 | 1 |
 | Bugs | 0 | 0 | 0 | 0 |
 | Performance | 0 | 0 | 1 | 1 |
-| Improvements & Refactors | 0 | 1 | 0 | 1 |
+| Improvements & Refactors | 0 | 0 | 0 | 0 |
 | Feature Ideas | 0 | 3 | 5 | 8 |
-| **Total** | **0** | **4** | **5** | **11** |
+| **Total** | **0** | **3** | **4** | **9** |

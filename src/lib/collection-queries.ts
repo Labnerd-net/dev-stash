@@ -1,10 +1,10 @@
 import { db } from "@/db";
 import { collections, itemCollections, items, itemTypes } from "@/db/schema";
-import { eq, and, desc, inArray, isNull, isNotNull } from "drizzle-orm";
+import { eq, and, desc, inArray, isNull, isNotNull, ilike } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import type { ItemWithType } from "@/lib/item-queries";
 
-export async function getCollections(userId: string) {
+export async function getCollections(userId: string, q?: string) {
   // Query 1: collections with item counts
   const rows = await db
     .select({
@@ -13,7 +13,11 @@ export async function getCollections(userId: string) {
     })
     .from(collections)
     .leftJoin(itemCollections, eq(itemCollections.collectionId, collections.id))
-    .where(and(eq(collections.userId, userId), isNull(collections.deletedAt)))
+    .where(and(
+      eq(collections.userId, userId),
+      isNull(collections.deletedAt),
+      q ? ilike(collections.name, `%${q}%`) : undefined,
+    ))
     .groupBy(collections.id)
     .orderBy(desc(collections.updatedAt));
 
