@@ -134,9 +134,6 @@ Everything else depends on this phase being solid before moving on.
 - [x] Prompt optimizer for prompt items
 - [x] Loading states and error handling for all AI actions
 
-### 19. Search Enhancements
-- [ ] Live results dropdown in header (debounced, keyboard-navigable)
-
 ### 20. Export
 - [x] Export all items as JSON
 - [x] Export all items as Markdown (one file per item or combined)
