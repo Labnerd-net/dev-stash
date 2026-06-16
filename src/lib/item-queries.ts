@@ -24,13 +24,26 @@ export async function getItemsByType(
   return base;
 }
 
-export async function getItemIdsByType(userId: string, typeId: string): Promise<string[]> {
-  const rows = await db
-    .select({ id: items.id })
-    .from(items)
-    .where(and(eq(items.userId, userId), eq(items.typeId, typeId), isNull(items.deletedAt)))
-    .orderBy(desc(items.isPinned), desc(items.createdAt));
-  return rows.map((r) => r.id);
+export async function getAdjacentItemIds(
+  userId: string,
+  typeId: string,
+  itemId: string
+): Promise<{ prevId: string | null; nextId: string | null }> {
+  const result = await db.execute(sql`
+    WITH ranked AS (
+      SELECT
+        id,
+        LAG(id)  OVER (ORDER BY is_pinned DESC, created_at DESC) AS prev_id,
+        LEAD(id) OVER (ORDER BY is_pinned DESC, created_at DESC) AS next_id
+      FROM items
+      WHERE user_id = ${userId}
+        AND type_id = ${typeId}
+        AND deleted_at IS NULL
+    )
+    SELECT prev_id, next_id FROM ranked WHERE id = ${itemId}
+  `);
+  const row = result.rows[0] as { prev_id: string | null; next_id: string | null } | undefined;
+  return { prevId: row?.prev_id ?? null, nextId: row?.next_id ?? null };
 }
 
 export async function getFavoriteItems(userId: string) {

@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Package, FolderOpen, Star, Bookmark } from "lucide-react";
-import { count, eq, and, isNull } from "drizzle-orm";
+import { count, eq, and, isNull, sql } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { items, collections } from "@/db/schema";
@@ -19,20 +19,27 @@ export default async function DashboardPage() {
   const userId = session.user.id;
 
   const [
-    [{ total: itemCount }],
-    [{ total: collectionCount }],
-    [{ total: favItemCount }],
-    [{ total: favCollectionCount }],
+    [itemStats],
+    [collectionStats],
     recentItems,
     latestCollections,
   ] = await Promise.all([
-    db.select({ total: count() }).from(items).where(and(eq(items.userId, userId), isNull(items.deletedAt))),
-    db.select({ total: count() }).from(collections).where(and(eq(collections.userId, userId), isNull(collections.deletedAt))),
-    db.select({ total: count() }).from(items).where(and(eq(items.userId, userId), eq(items.isFavorite, true), isNull(items.deletedAt))),
-    db.select({ total: count() }).from(collections).where(and(eq(collections.userId, userId), eq(collections.isFavorite, true), isNull(collections.deletedAt))),
+    db.select({
+      total: count(),
+      favorites: sql<number>`cast(sum(case when ${items.isFavorite} then 1 else 0 end) as int)`,
+    }).from(items).where(and(eq(items.userId, userId), isNull(items.deletedAt))),
+    db.select({
+      total: count(),
+      favorites: sql<number>`cast(sum(case when ${collections.isFavorite} then 1 else 0 end) as int)`,
+    }).from(collections).where(and(eq(collections.userId, userId), isNull(collections.deletedAt))),
     getRecentlyViewedItems(userId, 10),
     getCollections(userId),
   ]);
+
+  const itemCount = itemStats.total;
+  const favItemCount = itemStats.favorites ?? 0;
+  const collectionCount = collectionStats.total;
+  const favCollectionCount = collectionStats.favorites ?? 0;
 
   const recentItemIds = recentItems.map((r) => r.item.id);
   const recentTagsMap = await getTagsForItems(recentItemIds, userId);

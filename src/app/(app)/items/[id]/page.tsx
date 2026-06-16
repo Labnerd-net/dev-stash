@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
-import { getItemById, getItemIdsByType } from "@/lib/item-queries";
+import { getItemById, getAdjacentItemIds } from "@/lib/item-queries";
 import { getCollectionsForItem, getAllCollectionsForUser } from "@/lib/collection-queries";
 import { getTagsForItem } from "@/lib/tag-queries";
 import { TYPE_ID_TO_SLUG, TYPE_FIELD_CONFIG, ITEM_TYPE_MAP } from "@/lib/item-type-map";
@@ -43,10 +43,7 @@ export default async function ItemDetailPage({ params }: Props) {
   if (!row) notFound();
   void recordItemView(session.user.id, row.item.id).catch(() => {});
 
-  const siblingIds = await getItemIdsByType(session.user.id, row.item.typeId);
-  const currentIndex = siblingIds.indexOf(id);
-  const prevId = currentIndex > 0 ? siblingIds[currentIndex - 1] : null;
-  const nextId = currentIndex < siblingIds.length - 1 ? siblingIds[currentIndex + 1] : null;
+  const { prevId, nextId } = await getAdjacentItemIds(session.user.id, row.item.typeId, id);
 
   const { item, itemType } = row;
   const fieldConfig = TYPE_FIELD_CONFIG[item.typeId] ?? { hasContent: false, hasLanguage: false, hasUrl: false };
