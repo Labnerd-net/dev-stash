@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { tags, itemTags, items, itemTypes } from "@/db/schema";
-import { eq, and, inArray, desc, sql } from "drizzle-orm";
+import { eq, and, inArray, desc, sql, isNull } from "drizzle-orm";
 
 export async function getTagsWithItemCounts(userId: string, limit?: number) {
   const rows = await db
@@ -30,6 +30,7 @@ export async function getItemsByTag(
     .where(
       and(
         eq(items.userId, userId),
+        isNull(items.deletedAt),
         eq(tags.name, tagName),
         typeId ? eq(items.typeId, typeId) : undefined
       )

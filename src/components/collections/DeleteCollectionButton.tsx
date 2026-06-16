@@ -37,14 +37,14 @@ export function DeleteCollectionButton({
     return (
       <div className="flex flex-col items-end gap-1">
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">Sure?</span>
+          <span className="text-xs text-muted-foreground">Move to trash?</span>
           <Button
             variant="destructive"
             size="sm"
             disabled={isPending}
             onClick={handleConfirm}
           >
-            {isPending ? "Deleting…" : "Yes, delete"}
+            {isPending ? "Moving…" : "Yes, trash it"}
           </Button>
           <Button
             variant="ghost"

@@ -254,20 +254,10 @@ export async function deleteItem(formData: FormData): Promise<ActionResult> {
 
   const { id } = parsed.data;
 
-  const deleted = await db
-    .delete(items)
-    .where(and(eq(items.id, id), eq(items.userId, session.user.id)))
-    .returning({ fileUrl: items.fileUrl });
-
-  const fileKey = deleted[0]?.fileUrl;
-  if (fileKey) {
-    try {
-      const { env } = getCloudflareContext();
-      await env.dev_stash_files.delete(fileKey);
-    } catch {
-      // R2 delete failure is non-fatal; item is already deleted
-    }
-  }
+  await db
+    .update(items)
+    .set({ deletedAt: new Date() })
+    .where(and(eq(items.id, id), eq(items.userId, session.user.id)));
 
   revalidatePath("/");
   return { success: true };
@@ -308,18 +298,10 @@ export async function bulkDeleteItems(ids: string[]): Promise<BulkResult> {
   if (!session) return { success: false, error: "Unauthorized" };
   if (ids.length === 0) return { success: true };
 
-  const deleted = await db
-    .delete(items)
-    .where(and(inArray(items.id, ids), eq(items.userId, session.user.id)))
-    .returning({ fileUrl: items.fileUrl });
-
-  const fileKeys = deleted.map((d) => d.fileUrl).filter(Boolean) as string[];
-  if (fileKeys.length > 0) {
-    try {
-      const { env } = getCloudflareContext();
-      await Promise.all(fileKeys.map((key) => env.dev_stash_files.delete(key)));
-    } catch {}
-  }
+  await db
+    .update(items)
+    .set({ deletedAt: new Date() })
+    .where(and(inArray(items.id, ids), eq(items.userId, session.user.id)));
 
   revalidatePath("/", "layout");
   return { success: true };

@@ -103,6 +103,7 @@ export const items = pgTable(
       .references(() => itemTypes.id, { onDelete: "restrict" }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at"),
   },
   (table) => [
     index("items_user_id_idx").on(table.userId),
@@ -124,6 +125,7 @@ export const collections = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at"),
   },
   (table) => [index("collections_user_id_idx").on(table.userId)]
 );

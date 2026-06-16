@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { collections, itemCollections, items, itemTypes } from "@/db/schema";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, and, desc, inArray, isNull, isNotNull } from "drizzle-orm";
 import { sql } from "drizzle-orm";
 import type { ItemWithType } from "@/lib/item-queries";
 
@@ -13,7 +13,7 @@ export async function getCollections(userId: string) {
     })
     .from(collections)
     .leftJoin(itemCollections, eq(itemCollections.collectionId, collections.id))
-    .where(eq(collections.userId, userId))
+    .where(and(eq(collections.userId, userId), isNull(collections.deletedAt)))
     .groupBy(collections.id)
     .orderBy(desc(collections.updatedAt));
 
@@ -30,7 +30,7 @@ export async function getCollections(userId: string) {
     .from(itemCollections)
     .innerJoin(items, eq(items.id, itemCollections.itemId))
     .innerJoin(itemTypes, eq(itemTypes.id, items.typeId))
-    .where(inArray(itemCollections.collectionId, collectionIds))
+    .where(and(inArray(itemCollections.collectionId, collectionIds), isNull(items.deletedAt)))
     .groupBy(itemCollections.collectionId, itemTypes.color)
     .orderBy(desc(sql`count(${itemCollections.itemId})`));
 
@@ -50,7 +50,7 @@ export async function getCollections(userId: string) {
     })
     .from(itemCollections)
     .innerJoin(items, eq(items.id, itemCollections.itemId))
-    .where(inArray(itemCollections.collectionId, collectionIds))
+    .where(and(inArray(itemCollections.collectionId, collectionIds), isNull(items.deletedAt)))
     .orderBy(desc(itemCollections.addedAt));
 
   const previewTitlesMap = new Map<string, string[]>();
@@ -75,7 +75,7 @@ export async function getCollectionById(id: string, userId: string) {
   const rows = await db
     .select()
     .from(collections)
-    .where(and(eq(collections.id, id), eq(collections.userId, userId)));
+    .where(and(eq(collections.id, id), eq(collections.userId, userId), isNull(collections.deletedAt)));
   return rows[0] ?? null;
 }
 
@@ -93,7 +93,8 @@ export async function getCollectionItems(
     .where(
       and(
         eq(itemCollections.collectionId, collectionId),
-        eq(collections.userId, userId)
+        eq(collections.userId, userId),
+        isNull(items.deletedAt)
       )
     )
     .orderBy(desc(itemCollections.addedAt));
@@ -106,7 +107,7 @@ export async function getLatestCollections(userId: string, limit = 10) {
   return db
     .select({ id: collections.id, name: collections.name })
     .from(collections)
-    .where(eq(collections.userId, userId))
+    .where(and(eq(collections.userId, userId), isNull(collections.deletedAt)))
     .orderBy(desc(collections.updatedAt))
     .limit(limit);
 }
@@ -117,7 +118,7 @@ export async function getCollectionsForItem(itemId: string, userId: string) {
     .from(itemCollections)
     .innerJoin(collections, eq(collections.id, itemCollections.collectionId))
     .where(
-      and(eq(itemCollections.itemId, itemId), eq(collections.userId, userId))
+      and(eq(itemCollections.itemId, itemId), eq(collections.userId, userId), isNull(collections.deletedAt))
     );
 }
 
@@ -125,7 +126,7 @@ export async function getAllCollectionsForUser(userId: string) {
   return db
     .select({ id: collections.id, name: collections.name })
     .from(collections)
-    .where(eq(collections.userId, userId))
+    .where(and(eq(collections.userId, userId), isNull(collections.deletedAt)))
     .orderBy(collections.name);
 }
 
@@ -139,6 +140,14 @@ export async function getAllItemsMinimal(userId: string) {
     })
     .from(items)
     .innerJoin(itemTypes, eq(itemTypes.id, items.typeId))
-    .where(eq(items.userId, userId))
+    .where(and(eq(items.userId, userId), isNull(items.deletedAt)))
     .orderBy(items.title);
+}
+
+export async function getTrashedCollections(userId: string) {
+  return db
+    .select({ collection: collections })
+    .from(collections)
+    .where(and(eq(collections.userId, userId), isNotNull(collections.deletedAt)))
+    .orderBy(desc(collections.deletedAt));
 }

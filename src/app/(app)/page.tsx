@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Package, FolderOpen, Star, Bookmark } from "lucide-react";
-import { count, eq, and } from "drizzle-orm";
+import { count, eq, and, isNull } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { items, collections } from "@/db/schema";
@@ -20,10 +20,10 @@ export default async function DashboardPage() {
     [{ total: favItemCount }],
     [{ total: favCollectionCount }],
   ] = await Promise.all([
-    db.select({ total: count() }).from(items).where(eq(items.userId, userId)),
-    db.select({ total: count() }).from(collections).where(eq(collections.userId, userId)),
-    db.select({ total: count() }).from(items).where(and(eq(items.userId, userId), eq(items.isFavorite, true))),
-    db.select({ total: count() }).from(collections).where(and(eq(collections.userId, userId), eq(collections.isFavorite, true))),
+    db.select({ total: count() }).from(items).where(and(eq(items.userId, userId), isNull(items.deletedAt))),
+    db.select({ total: count() }).from(collections).where(and(eq(collections.userId, userId), isNull(collections.deletedAt))),
+    db.select({ total: count() }).from(items).where(and(eq(items.userId, userId), eq(items.isFavorite, true), isNull(items.deletedAt))),
+    db.select({ total: count() }).from(collections).where(and(eq(collections.userId, userId), eq(collections.isFavorite, true), isNull(collections.deletedAt))),
   ]);
 
   const stats = [
