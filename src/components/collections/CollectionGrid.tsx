@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { CollectionCard } from "./CollectionCard";
+import { EmptyState } from "@/components/shared/EmptyState";
 import type { CollectionWithMeta } from "@/lib/collection-queries";
 
 interface CollectionGridProps {
@@ -9,15 +9,10 @@ interface CollectionGridProps {
 export function CollectionGrid({ collections }: CollectionGridProps) {
   if (collections.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-sm text-muted-foreground">No collections yet.</p>
-        <Link
-          href="/collections/new"
-          className="mt-3 text-sm text-primary hover:underline"
-        >
-          Create your first collection
-        </Link>
-      </div>
+      <EmptyState
+        message="No collections yet."
+        action={{ label: "Create your first collection", href: "/collections/new" }}
+      />
     );
   }
 

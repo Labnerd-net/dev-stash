@@ -53,10 +53,7 @@ _None identified._
 - **#3 [src/components/collections/CollectionSearch.tsx]**: Collection search is client-side only; state is lost on page refresh and won't scale with large collection sets. Fix: move to URL-based search (`/collections?q=...`) with server-side filtering in `getCollections()`, matching the search page pattern.
 
 ### Low
-- **#4 [multiple]**: Empty state UI is duplicated across `ItemList.tsx`, `BulkItemList.tsx`, `CollectionGrid.tsx`, and inline in several page components. Fix: extract to a shared `<EmptyState label icon action />` component in `src/components/shared/`.
-- **#5 [src/components/items/ItemForm.tsx]**: `useEffect` for draft restore has `// eslint-disable-next-line react-hooks/exhaustive-deps`. With React Compiler enabled this can conflict with compiler optimizations. Fix: use the `useRef` mount-guard pattern instead.
-- **#6 [item delete flow]**: After soft-deleting an item the user is redirected away with no undo affordance. The item is recoverable from `/trash` but there's no immediate prompt. Fix: show a toast with an "Undo" button that calls `restoreItem(id)` within a short window.
-- **#7 [src/components/items/ItemRow.tsx, item detail page]**: Language badge is styled differently in `ItemRow` vs item detail page vs `ItemForm`. Fix: extract a `<LanguageBadge language={string} />` component used in all three.
+_None identified._
 
 ---
 
@@ -87,6 +84,6 @@ _None identified._
 | Security | 0 | 0 | 1 | 1 |
 | Bugs | 0 | 0 | 0 | 0 |
 | Performance | 0 | 0 | 1 | 1 |
-| Improvements & Refactors | 0 | 1 | 4 | 5 |
+| Improvements & Refactors | 0 | 1 | 0 | 1 |
 | Feature Ideas | 0 | 3 | 5 | 8 |
-| **Total** | **0** | **4** | **9** | **15** |
+| **Total** | **0** | **4** | **5** | **11** |

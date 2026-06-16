@@ -9,6 +9,7 @@ import { DeleteItemButton } from "./DeleteItemButton";
 import { FavoriteItemButton } from "./FavoriteItemButton";
 import { PinItemButton } from "./PinItemButton";
 import { CopyButton } from "./CopyButton";
+import { LanguageBadge } from "./LanguageBadge";
 import { toggleItemFavorite, toggleItemPin } from "@/actions/favorites";
 import type { ItemWithType } from "@/lib/item-queries";
 import { stripHtml, formatBytes } from "@/lib/html-utils";
@@ -113,11 +114,7 @@ export function ItemRow({ row, tags, isSelected, onToggle }: ItemRowProps) {
           >
             {item.title}
           </Link>
-          {item.language && (
-            <span className="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground font-mono">
-              {item.language}
-            </span>
-          )}
+          <LanguageBadge language={item.language} />
         </div>
         {preview && (
           <p className="text-xs text-muted-foreground truncate">{preview}</p>

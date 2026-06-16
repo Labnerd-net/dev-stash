@@ -65,9 +65,12 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
   const [fileSize, setFileSize] = useState<number | null>(initialValues?.fileSize ?? null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
+  const hasRestoredDraft = useRef(false);
+
   // Restore draft on mount (create mode only)
   useEffect(() => {
-    if (mode !== "create") return;
+    if (hasRestoredDraft.current || mode !== "create") return;
+    hasRestoredDraft.current = true;
     try {
       const saved = localStorage.getItem(DRAFT_KEY);
       if (!saved) return;
@@ -79,8 +82,7 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
       if (draft.description) setDescriptionValue(draft.description);
       if (draft.url) setUrlValue(draft.url);
     } catch {}
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mode]);
 
   // Debounced draft save (create mode only)
   useEffect(() => {

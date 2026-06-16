@@ -18,6 +18,7 @@ import { getTypeColor } from "@/lib/utils";
 import { AiCodeExplainer } from "@/components/items/AiCodeExplainer";
 import { AiSummary } from "@/components/items/AiSummary";
 import { AiPromptOptimizer } from "@/components/items/AiPromptOptimizer";
+import { LanguageBadge } from "@/components/items/LanguageBadge";
 import { TextFilePreview } from "@/components/items/TextFilePreview";
 import { DuplicateItemButton } from "@/components/items/DuplicateItemButton";
 import { QuickCollectionPicker } from "@/components/items/QuickCollectionPicker";
@@ -66,11 +67,7 @@ export default async function ItemDetailPage({ params }: Props) {
               style={{ backgroundColor: getTypeColor(itemType.color) }}
             />
             <span className="text-xs text-muted-foreground">{itemType.name}</span>
-            {item.language && (
-              <span className="rounded-md bg-muted px-1.5 py-0.5 text-xs text-muted-foreground font-mono">
-                {item.language}
-              </span>
-            )}
+            <LanguageBadge language={item.language} />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">{item.title}</h1>
         </div>

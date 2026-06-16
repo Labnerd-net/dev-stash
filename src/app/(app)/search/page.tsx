@@ -6,6 +6,7 @@ import { searchItems } from "@/lib/item-queries";
 import { getTagsForItems } from "@/lib/tag-queries";
 import { ITEM_TYPE_MAP } from "@/lib/item-type-map";
 import { ItemRow } from "@/components/items/ItemRow";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 const VALID_TYPE_IDS = new Set<string>(
   Object.values(ITEM_TYPE_MAP).map((v) => v.typeId)
@@ -75,17 +76,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       {/* Results */}
       {!query ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            Enter a search term above to find your items.
-          </p>
-        </div>
+        <EmptyState message="Enter a search term above to find your items." />
       ) : results.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            No items found for &ldquo;{query}&rdquo;.
-          </p>
-        </div>
+        <EmptyState message={`No items found for "${query}".`} />
       ) : (
         <ul className="divide-y divide-border rounded-lg border border-border">
           {results.map((row) => (

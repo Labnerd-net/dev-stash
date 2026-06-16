@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { ItemRow } from "./ItemRow";
+import { EmptyState } from "@/components/shared/EmptyState";
 import {
   bulkFavoriteItems,
   bulkPinItems,
@@ -30,12 +30,10 @@ export function BulkItemList({ items, label, tagsMap, collections = [] }: BulkIt
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-sm text-muted-foreground">No {label.toLowerCase()} yet.</p>
-        <Link href="/items/new" className="mt-3 text-sm text-primary hover:underline">
-          Create your first one
-        </Link>
-      </div>
+      <EmptyState
+        message={`No ${label.toLowerCase()} yet.`}
+        action={{ label: "Create your first one", href: "/items/new" }}
+      />
     );
   }
 
