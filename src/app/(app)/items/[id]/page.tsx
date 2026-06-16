@@ -14,6 +14,7 @@ import { PinItemButton } from "@/components/items/PinItemButton";
 import { CopyButton } from "@/components/items/CopyButton";
 import { recordItemView } from "@/lib/recently-used-queries";
 import { formatBytes } from "@/lib/html-utils";
+import { getTypeColor } from "@/lib/utils";
 import { AiCodeExplainer } from "@/components/items/AiCodeExplainer";
 import { AiSummary } from "@/components/items/AiSummary";
 import { AiPromptOptimizer } from "@/components/items/AiPromptOptimizer";
@@ -65,7 +66,7 @@ export default async function ItemDetailPage({ params }: Props) {
           <div className="flex items-center gap-2">
             <span
               className="size-2 shrink-0 rounded-full"
-              style={{ backgroundColor: itemType.color ?? "#888" }}
+              style={{ backgroundColor: getTypeColor(itemType.color) }}
             />
             <span className="text-xs text-muted-foreground">{itemType.name}</span>
             {item.language && (

@@ -12,6 +12,7 @@ import { CopyButton } from "./CopyButton";
 import { toggleItemFavorite, toggleItemPin } from "@/actions/favorites";
 import type { ItemWithType } from "@/lib/item-queries";
 import { stripHtml, formatBytes } from "@/lib/html-utils";
+import { getTypeColor } from "@/lib/utils";
 
 interface ItemRowProps {
   row: ItemWithType;
@@ -145,7 +146,7 @@ export function ItemRow({ row, tags, isSelected, onToggle }: ItemRowProps) {
         <PinItemButton itemId={item.id} isPinned={item.isPinned} />
         <span
           className="size-2 rounded-full mx-1"
-          style={{ backgroundColor: itemType.color ?? "#888" }}
+          style={{ backgroundColor: getTypeColor(itemType.color) }}
         />
         <DeleteItemButton
           id={item.id}

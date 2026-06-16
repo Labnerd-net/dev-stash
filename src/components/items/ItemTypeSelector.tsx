@@ -1,5 +1,7 @@
 "use client";
 
+import { getTypeColor } from "@/lib/utils";
+
 interface ItemType {
   id: string;
   name: string;
@@ -36,7 +38,7 @@ export function ItemTypeSelector({ types, value, onChange, disabled }: ItemTypeS
           >
             <span
               className="size-2 shrink-0 rounded-full"
-              style={{ backgroundColor: type.color ?? "#888" }}
+              style={{ backgroundColor: getTypeColor(type.color) }}
             />
             <span className="truncate">{type.name}</span>
           </button>

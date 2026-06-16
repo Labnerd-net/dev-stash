@@ -7,7 +7,9 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { items, collections } from "@/db/schema";
 import { RecentlyUsedSection } from "@/components/dashboard/RecentlyUsedSection";
+import { CollectionGrid } from "@/components/collections/CollectionGrid";
 import { getRecentlyViewedItems } from "@/lib/recently-used-queries";
+import { getCollections } from "@/lib/collection-queries";
 import { getTagsForItems } from "@/lib/tag-queries";
 
 export default async function DashboardPage() {
@@ -22,12 +24,14 @@ export default async function DashboardPage() {
     [{ total: favItemCount }],
     [{ total: favCollectionCount }],
     recentItems,
+    latestCollections,
   ] = await Promise.all([
     db.select({ total: count() }).from(items).where(and(eq(items.userId, userId), isNull(items.deletedAt))),
     db.select({ total: count() }).from(collections).where(and(eq(collections.userId, userId), isNull(collections.deletedAt))),
     db.select({ total: count() }).from(items).where(and(eq(items.userId, userId), eq(items.isFavorite, true), isNull(items.deletedAt))),
     db.select({ total: count() }).from(collections).where(and(eq(collections.userId, userId), eq(collections.isFavorite, true), isNull(collections.deletedAt))),
     getRecentlyViewedItems(userId, 10),
+    getCollections(userId),
   ]);
 
   const recentItemIds = recentItems.map((r) => r.item.id);
@@ -79,7 +83,11 @@ export default async function DashboardPage() {
             View all
           </Link>
         </div>
-        <p className="text-sm text-muted-foreground">No collections yet.</p>
+        {latestCollections.length > 0 ? (
+          <CollectionGrid collections={latestCollections.slice(0, 5)} />
+        ) : (
+          <p className="text-sm text-muted-foreground">No collections yet.</p>
+        )}
       </div>
     </div>
   );

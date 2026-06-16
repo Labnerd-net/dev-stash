@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { restoreItem, permanentDeleteItem } from "@/actions/trash";
 import type { getTrashedItems } from "@/lib/item-queries";
+import { getTypeColor } from "@/lib/utils";
 
 type TrashedItem = Awaited<ReturnType<typeof getTrashedItems>>[number];
 
@@ -53,7 +54,7 @@ export function TrashItemRow({ row }: TrashItemRowProps) {
         <div className="flex items-center gap-2">
           <span
             className="size-2 rounded-full shrink-0"
-            style={{ backgroundColor: itemType.color ?? "#888" }}
+            style={{ backgroundColor: getTypeColor(itemType.color) }}
           />
           <span className="text-sm font-medium truncate">{item.title}</span>
           <span className="shrink-0 text-xs text-muted-foreground">{itemType.name}</span>
