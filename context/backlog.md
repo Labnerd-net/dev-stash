@@ -51,37 +51,33 @@ _None identified._
 _None identified._
 
 ### Medium
-- **#5 [src/app/(app)/page.tsx:71]**: Dashboard "Collections" section always renders "No collections yet." — it never fetches real data. Fix: call `getLatestCollections(userId, 5)` on the dashboard page and render `CollectionGrid`, with the empty state shown only when `collections.length === 0`.
-- **#6 [src/components/collections/CollectionSearch.tsx]**: Collection search is client-side only; state is lost on page refresh and won't scale with large collection sets. Fix: move to URL-based search (`/collections?q=...`) with server-side filtering in `getCollections()`, matching the search page pattern.
-- **#7 [src/components/items/, src/components/collections/]**: Icon-only buttons (favorite, pin, delete, copy) lack `aria-label` attributes. Screen readers announce nothing meaningful. Fix: audit all `<button>` elements with only icon children and add descriptive labels.
+- **#5 [src/components/collections/CollectionSearch.tsx]**: Collection search is client-side only; state is lost on page refresh and won't scale with large collection sets. Fix: move to URL-based search (`/collections?q=...`) with server-side filtering in `getCollections()`, matching the search page pattern.
 
 ### Low
-- **#8 [multiple]**: Empty state UI is duplicated across `ItemList.tsx`, `BulkItemList.tsx`, `CollectionGrid.tsx`, and inline in several page components. Fix: extract to a shared `<EmptyState label icon action />` component in `src/components/shared/`.
-- **#9 [multiple pages]**: Page title/subtitle pattern is inconsistent — some pages show item counts, others show nothing. Fix: standardize all list pages to show a subtitle with current count.
-- **#10 [multiple components]**: `itemType.color ?? "#888"` appears 5+ times across `ItemRow`, `TrashItemRow`, `TrashCollectionRow`, item detail page, etc. Fix: extract `getTypeColor(color: string | null): string` utility into `src/lib/utils.ts`.
-- **#11 [src/components/items/ItemForm.tsx]**: `useEffect` for draft restore has `// eslint-disable-next-line react-hooks/exhaustive-deps`. With React Compiler enabled this can conflict with compiler optimizations. Fix: use the `useRef` mount-guard pattern instead.
-- **#12 [item delete flow]**: After soft-deleting an item the user is redirected away with no undo affordance. The item is recoverable from `/trash` but there's no immediate prompt. Fix: show a toast with an "Undo" button that calls `restoreItem(id)` within a short window.
-- **#13 [src/components/items/ItemRow.tsx, item detail page]**: Language badge is styled differently in `ItemRow` vs item detail page vs `ItemForm`. Fix: extract a `<LanguageBadge language={string} />` component used in all three.
+- **#6 [multiple]**: Empty state UI is duplicated across `ItemList.tsx`, `BulkItemList.tsx`, `CollectionGrid.tsx`, and inline in several page components. Fix: extract to a shared `<EmptyState label icon action />` component in `src/components/shared/`.
+- **#7 [src/components/items/ItemForm.tsx]**: `useEffect` for draft restore has `// eslint-disable-next-line react-hooks/exhaustive-deps`. With React Compiler enabled this can conflict with compiler optimizations. Fix: use the `useRef` mount-guard pattern instead.
+- **#8 [item delete flow]**: After soft-deleting an item the user is redirected away with no undo affordance. The item is recoverable from `/trash` but there's no immediate prompt. Fix: show a toast with an "Undo" button that calls `restoreItem(id)` within a short window.
+- **#9 [src/components/items/ItemRow.tsx, item detail page]**: Language badge is styled differently in `ItemRow` vs item detail page vs `ItemForm`. Fix: extract a `<LanguageBadge language={string} />` component used in all three.
 
 ---
 
 ## Feature Ideas
 
 ### High
-- **#14 [src/components/app/Header.tsx]**: Cmd+K command palette is shown as a UI hint in the header but not implemented. Fix: build a modal dialog that opens on Cmd+K with item search, quick navigation links (New Item, New Collection, Recently Used, Trash, Settings), and type filters.
+- **#10 [src/components/app/Header.tsx]**: Cmd+K command palette is shown as a UI hint in the header but not implemented. Fix: build a modal dialog that opens on Cmd+K with item search, quick navigation links (New Item, New Collection, Recently Used, Trash, Settings), and type filters.
 
 ### Medium
-- **#15 [src/components/items/BulkItemList.tsx]**: Bulk actions support favorite, pin, delete, add-to-collection, and add-tag — but the tag action (`bulkAddTag`) is imported and available yet there's no UI for it in the action bar. Fix: add a tag input chip in the bulk bar that calls the existing action.
-- **#16 [future]**: No import flow for external content. Add an `/import` page supporting: paste multiple items (one per line), upload a JSON export file, or fetch a GitHub Gist URL and create items from parsed content.
-- **#17 [src/app/api/export/]**: Export API only supports exporting all items or a single collection. Add `?type=` and `?tag=` query parameters to `/api/export/items` to enable filtered exports.
+- **#11 [src/components/items/BulkItemList.tsx]**: Bulk actions support favorite, pin, delete, add-to-collection, and add-tag — but the tag action (`bulkAddTag`) is imported and available yet there's no UI for it in the action bar. Fix: add a tag input chip in the bulk bar that calls the existing action.
+- **#12 [future]**: No import flow for external content. Add an `/import` page supporting: paste multiple items (one per line), upload a JSON export file, or fetch a GitHub Gist URL and create items from parsed content.
+- **#13 [src/app/api/export/]**: Export API only supports exporting all items or a single collection. Add `?type=` and `?tag=` query parameters to `/api/export/items` to enable filtered exports.
 
 ### Low
-- **#18 [src/app/(app)/collections/[id]/]**: No way to duplicate an entire collection. Fix: add a "Duplicate" action on the collection detail page that clones metadata and item memberships.
-- **#19 [future]**: No shareable item links. Items are fully private behind auth. Add an optional public/share toggle per item that generates a token-based read-only URL (e.g. `/share/abc123`).
-- **#20 [src/app/(app)/items/[id]/page.tsx]**: No related items section on detail page. Fix: add a "Related" section querying items that share tags with the current item, limited to 5, excluding the current item.
-- **#21 [future]**: Language field not included in full-text search index. Searching "python" won't match items where `language = "python"`. Fix: add `COALESCE(language, '')` to the `to_tsvector` expression in `searchItems` and regenerate the GIN index.
-- **#22 [future]**: No way to filter collections to favorites-only without browsing the full list. Fix: add a `/collections?filter=favorite` route with a filter chip UI matching the search page type-filter pattern.
-- **#23 [future]**: No Cloudflare KV caching for frequently-read, rarely-changed data (tag lists, collection lists, dashboard stats). On hold — current single-user traffic doesn't justify the complexity.
+- **#14 [src/app/(app)/collections/[id]/]**: No way to duplicate an entire collection. Fix: add a "Duplicate" action on the collection detail page that clones metadata and item memberships.
+- **#15 [future]**: No shareable item links. Items are fully private behind auth. Add an optional public/share toggle per item that generates a token-based read-only URL (e.g. `/share/abc123`).
+- **#16 [src/app/(app)/items/[id]/page.tsx]**: No related items section on detail page. Fix: add a "Related" section querying items that share tags with the current item, limited to 5, excluding the current item.
+- **#17 [future]**: Language field not included in full-text search index. Searching "python" won't match items where `language = "python"`. Fix: add `COALESCE(language, '')` to the `to_tsvector` expression in `searchItems` and regenerate the GIN index.
+- **#18 [future]**: No way to filter collections to favorites-only without browsing the full list. Fix: add a `/collections?filter=favorite` route with a filter chip UI matching the search page type-filter pattern.
+- **#19 [future]**: No Cloudflare KV caching for frequently-read, rarely-changed data (tag lists, collection lists, dashboard stats). On hold — current single-user traffic doesn't justify the complexity.
 
 ---
 
@@ -92,6 +88,6 @@ _None identified._
 | Security | 0 | 0 | 1 | 1 |
 | Bugs | 0 | 0 | 0 | 0 |
 | Performance | 0 | 2 | 1 | 3 |
-| Improvements & Refactors | 0 | 3 | 6 | 9 |
-| Feature Ideas | 1 | 3 | 6 | 10 |
-| **Total** | **1** | **8** | **14** | **23** |
+| Improvements & Refactors | 0 | 1 | 4 | 5 |
+| Feature Ideas | 1 | 3 | 5 | 9 |
+| **Total** | **1** | **6** | **11** | **18** |
