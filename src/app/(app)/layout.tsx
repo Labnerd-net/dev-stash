@@ -2,9 +2,11 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { SidebarProvider } from "@/components/app/SidebarContext";
+import { PaletteProvider } from "@/components/app/PaletteContext";
 import { Sidebar } from "@/components/app/Sidebar";
 import { Header } from "@/components/app/Header";
 import { KeyboardShortcuts } from "@/components/app/KeyboardShortcuts";
+import { CommandPalette } from "@/components/app/CommandPalette";
 import { Toaster } from "@/components/ui/sonner";
 
 export default async function AppLayout({
@@ -20,15 +22,18 @@ export default async function AppLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen overflow-hidden">
-        <Sidebar userId={session.user.id} />
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <Header user={session.user} />
-          <main className="flex-1 overflow-y-auto p-6">{children}</main>
+      <PaletteProvider>
+        <div className="flex h-screen overflow-hidden">
+          <Sidebar userId={session.user.id} />
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <Header user={session.user} />
+            <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          </div>
         </div>
-      </div>
-      <KeyboardShortcuts />
-      <Toaster position="bottom-right" duration={2000} />
+        <KeyboardShortcuts />
+        <CommandPalette />
+        <Toaster position="bottom-right" duration={2000} />
+      </PaletteProvider>
     </SidebarProvider>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { usePalette } from "./PaletteContext";
 
 const IGNORED_TAGS = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 
@@ -14,12 +15,19 @@ function isTypingTarget(el: Element | null): boolean {
 
 export function KeyboardShortcuts() {
   const router = useRouter();
+  const { open } = usePalette();
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (isTypingTarget(document.activeElement)) return;
 
       const mod = e.metaKey || e.ctrlKey;
+
+      if (mod && !e.shiftKey && e.key === "k") {
+        e.preventDefault();
+        open();
+        return;
+      }
 
       if (mod && !e.shiftKey && e.key === "n") {
         e.preventDefault();
@@ -36,7 +44,7 @@ export function KeyboardShortcuts() {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [router]);
+  }, [router, open]);
 
   return null;
 }

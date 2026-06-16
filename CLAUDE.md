@@ -177,4 +177,12 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 - Trash UI components: `src/components/trash/` — `TrashItemRow`, `TrashCollectionRow`, `EmptyTrashButton` (all client components)
 - `/trash` page: `src/app/(app)/trash/page.tsx`; Trash link in `SidebarNav.tsx` uses `Trash2` icon
 
+## Command Palette
+
+- `PaletteContext` (`src/components/app/PaletteContext.tsx`, `'use client'`) — `{ isOpen, open, close }`; `PaletteProvider` wraps the app layout inside `SidebarProvider`; `usePalette()` hook used by `Header`, `KeyboardShortcuts`, `CommandPalette`
+- `CommandPalette` (`src/components/app/CommandPalette.tsx`, `'use client'`) — modal overlay mounted in app layout; shows quick nav links when query is empty, debounced item search results (200ms) when typing; arrow-key navigation + Enter to navigate; closes on Escape, backdrop click, or route change
+- `paletteSearch` server action in `src/actions/search.ts` — wraps `searchItems` with session auth; used by `CommandPalette` client component to search items
+- `KeyboardShortcuts` opens palette on Cmd+K / Ctrl+K (guard: `isTypingTarget` skips when focus is in input/textarea/select/contenteditable)
+- Header search area is a `<button>` that calls `open()` — no longer a `<form>`; `/search` page still accessible directly
+
 **IMPORTANT:** Do not add Claude to any commit messages

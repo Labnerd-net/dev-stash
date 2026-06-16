@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "./SidebarContext";
+import { usePalette } from "./PaletteContext";
 
 interface User {
   name: string;
@@ -19,6 +20,7 @@ interface HeaderProps {
 export function Header({ user }: HeaderProps) {
   const router = useRouter();
   const { openMobile } = useSidebar();
+  const { open: openPalette } = usePalette();
   const { resolvedTheme, setTheme } = useTheme();
 
   async function handleSignOut() {
@@ -38,18 +40,17 @@ export function Header({ user }: HeaderProps) {
       </button>
 
       <div className="flex-1 hidden md:flex justify-center">
-        <form action="/search" className="relative w-full max-w-sm">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-          <input
-            type="search"
-            name="q"
-            placeholder="Search items…"
-            className="w-full h-8 pl-8 pr-12 rounded-md bg-input/50 border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-          />
-          <kbd className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground pointer-events-none">
+        <button
+          onClick={openPalette}
+          className="relative w-full max-w-sm h-8 flex items-center text-left rounded-md bg-input/50 border border-border hover:bg-input/80 transition-colors"
+          aria-label="Open command palette"
+        >
+          <Search className="absolute left-2.5 size-3.5 text-muted-foreground" />
+          <span className="pl-8 pr-12 text-sm text-muted-foreground">Search items…</span>
+          <kbd className="absolute right-2 inline-flex items-center rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
             ⌘K
           </kbd>
-        </form>
+        </button>
       </div>
 
       <div className="flex items-center gap-2">
