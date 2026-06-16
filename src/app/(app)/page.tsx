@@ -34,10 +34,10 @@ export default async function DashboardPage() {
   const recentTagsMap = await getTagsForItems(recentItemIds, userId);
 
   const stats = [
-    { label: "Your Items",           value: itemCount,          icon: Package,    color: "text-blue-400",   bg: "bg-blue-500/10"   },
-    { label: "Collections",          value: collectionCount,    icon: FolderOpen, color: "text-teal-400",   bg: "bg-teal-500/10"   },
-    { label: "Favorite Items",       value: favItemCount,       icon: Star,       color: "text-amber-400",  bg: "bg-amber-500/10"  },
-    { label: "Favorite Collections", value: favCollectionCount, icon: Bookmark,   color: "text-purple-400", bg: "bg-purple-500/10" },
+    { label: "Your Items",           value: itemCount,          icon: Package,    color: "text-blue-400",   bg: "bg-blue-500/10",   href: "/snippets"    },
+    { label: "Collections",          value: collectionCount,    icon: FolderOpen, color: "text-teal-400",   bg: "bg-teal-500/10",   href: "/collections" },
+    { label: "Favorite Items",       value: favItemCount,       icon: Star,       color: "text-amber-400",  bg: "bg-amber-500/10",  href: "/favorites"   },
+    { label: "Favorite Collections", value: favCollectionCount, icon: Bookmark,   color: "text-purple-400", bg: "bg-purple-500/10", href: "/collections" },
   ];
 
   return (
@@ -50,10 +50,11 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map(({ label, value, icon: Icon, color, bg }) => (
-          <div
+        {stats.map(({ label, value, icon: Icon, color, bg, href }) => (
+          <Link
             key={label}
-            className="rounded-lg border border-border bg-card p-4 flex items-center gap-4"
+            href={href}
+            className="rounded-lg border border-border bg-card p-4 flex items-center gap-4 hover:bg-muted/30 transition-colors"
           >
             <div className={`${bg} ${color} rounded-md p-2`}>
               <Icon className="size-5" />
@@ -62,7 +63,7 @@ export default async function DashboardPage() {
               <p className="text-2xl font-semibold">{value}</p>
               <p className="text-xs text-muted-foreground">{label}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 

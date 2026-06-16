@@ -219,6 +219,9 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
           }}
           disabled={mode === "edit"}
         />
+        {mode === "edit" && (
+          <p className="text-xs text-muted-foreground">Type cannot be changed after creation.</p>
+        )}
       </div>
 
       <div className="space-y-1.5">
@@ -426,7 +429,7 @@ export function ItemForm({ mode, types, initialValues, defaultTypeId, collection
       )}
 
       <div className="flex items-center gap-3">
-        <Button type="submit" disabled={isPending || uploadState === "uploading"}>
+        <Button type="submit" disabled={isPending || uploadState === "uploading" || !!uploadError}>
           {isPending
             ? mode === "create" ? "Creating…" : "Saving…"
             : mode === "create" ? "Create Item" : "Save Changes"}

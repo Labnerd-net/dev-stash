@@ -6,13 +6,14 @@ export async function getTagsWithItemCounts(userId: string, limit?: number) {
   const rows = await db
     .select({
       name: tags.name,
-      count: sql<number>`cast(count(${itemTags.itemId}) as int)`,
+      count: sql<number>`cast(count(${items.id}) as int)`,
     })
     .from(tags)
     .leftJoin(itemTags, eq(itemTags.tagId, tags.id))
+    .leftJoin(items, and(eq(items.id, itemTags.itemId), isNull(items.deletedAt)))
     .where(eq(tags.userId, userId))
     .groupBy(tags.id, tags.name)
-    .orderBy(desc(sql`count(${itemTags.itemId})`));
+    .orderBy(desc(sql`count(${items.id})`));
   return limit ? rows.slice(0, limit) : rows;
 }
 

@@ -14,7 +14,7 @@ export default async function TrashPage() {
 
   const userId = session.user.id;
 
-  await purgeExpiredTrash(userId);
+  await purgeExpiredTrash();
 
   const [trashedItems, trashedCollections] = await Promise.all([
     getTrashedItems(userId),

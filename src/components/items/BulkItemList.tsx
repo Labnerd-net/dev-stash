@@ -101,14 +101,14 @@ export function BulkItemList({ items, label, tagsMap, collections = [] }: BulkIt
                   onClick={() => runAction(() => bulkFavoriteItems(selectedArr, true))}
                   className={btnClass}
                 >
-                  Favorite
+                  {isPending ? "Favoriting…" : "Favorite"}
                 </button>
                 <button
                   disabled={isPending}
                   onClick={() => runAction(() => bulkPinItems(selectedArr, true))}
                   className={btnClass}
                 >
-                  Pin
+                  {isPending ? "Pinning…" : "Pin"}
                 </button>
                 {collections.length > 0 && (
                   <div className="flex items-center gap-1">

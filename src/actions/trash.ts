@@ -15,16 +15,15 @@ export async function restoreItem(itemId: string): Promise<ActionResult> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return { success: false, error: "Unauthorized" };
 
-  await db
+  const updated = await db
     .update(items)
     .set({ deletedAt: null })
-    .where(and(eq(items.id, itemId), eq(items.userId, session.user.id)));
+    .where(and(eq(items.id, itemId), eq(items.userId, session.user.id)))
+    .returning({ typeId: items.typeId });
 
-  const row = await db
-    .select({ typeId: items.typeId })
-    .from(items)
-    .where(and(eq(items.id, itemId), eq(items.userId, session.user.id)));
-  const slug = row[0] ? TYPE_ID_TO_SLUG[row[0].typeId] : null;
+  if (updated.length === 0) return { success: false, error: "Not found" };
+
+  const slug = TYPE_ID_TO_SLUG[updated[0].typeId] ?? null;
   if (slug) revalidatePath(`/${slug}`);
   revalidatePath("/");
   revalidatePath("/trash");
@@ -108,13 +107,17 @@ export async function emptyTrash(): Promise<ActionResult> {
   return { success: true };
 }
 
-export async function purgeExpiredTrash(userId: string): Promise<void> {
+export async function purgeExpiredTrash(): Promise<void> {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return;
+
+  const userId = session.user.id;
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
   const expiredItems = await db
     .select({ id: items.id, fileUrl: items.fileUrl })
     .from(items)
-    .where(and(eq(items.userId, userId), lt(items.deletedAt, thirtyDaysAgo)));
+    .where(and(eq(items.userId, userId), isNotNull(items.deletedAt), lt(items.deletedAt, thirtyDaysAgo)));
 
   if (expiredItems.length > 0) {
     const fileKeys = expiredItems.map((r) => r.fileUrl).filter(Boolean) as string[];
@@ -126,10 +129,10 @@ export async function purgeExpiredTrash(userId: string): Promise<void> {
         // R2 failure is non-fatal
       }
     }
-    await db.delete(items).where(and(eq(items.userId, userId), lt(items.deletedAt, thirtyDaysAgo)));
+    await db.delete(items).where(and(eq(items.userId, userId), isNotNull(items.deletedAt), lt(items.deletedAt, thirtyDaysAgo)));
   }
 
   await db
     .delete(collections)
-    .where(and(eq(collections.userId, userId), lt(collections.deletedAt, thirtyDaysAgo)));
+    .where(and(eq(collections.userId, userId), isNotNull(collections.deletedAt), lt(collections.deletedAt, thirtyDaysAgo)));
 }

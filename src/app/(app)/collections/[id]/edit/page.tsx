@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
+import Link from "next/link";
 import { auth } from "@/lib/auth";
 import {
   getCollectionById,
@@ -37,6 +38,12 @@ export default async function EditCollectionPage({ params }: Props) {
           Update your collection&apos;s details.
         </p>
       </div>
+      <Link
+        href={`/collections/${id}`}
+        className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+      >
+        ← Back to {collection.name}
+      </Link>
       <CollectionForm
         mode="edit"
         allItems={allItems}

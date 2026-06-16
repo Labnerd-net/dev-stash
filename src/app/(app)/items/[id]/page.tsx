@@ -13,6 +13,7 @@ import { FavoriteItemButton } from "@/components/items/FavoriteItemButton";
 import { PinItemButton } from "@/components/items/PinItemButton";
 import { CopyButton } from "@/components/items/CopyButton";
 import { recordItemView } from "@/lib/recently-used-queries";
+import { formatBytes } from "@/lib/html-utils";
 import { AiCodeExplainer } from "@/components/items/AiCodeExplainer";
 import { AiSummary } from "@/components/items/AiSummary";
 import { AiPromptOptimizer } from "@/components/items/AiPromptOptimizer";
@@ -22,12 +23,6 @@ import { QuickCollectionPicker } from "@/components/items/QuickCollectionPicker"
 import { isTextFile } from "@/lib/text-file";
 
 const CODE_TYPE_IDS = new Set(["system_snippet", "system_command", "system_prompt"]);
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 interface Props {
   params: Promise<{ id: string }>;

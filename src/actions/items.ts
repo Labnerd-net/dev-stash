@@ -104,7 +104,7 @@ export async function createItem(formData: FormData): Promise<ActionResult> {
     contentType: isFileType ? "file" : "text",
     fileUrl: isFileType ? fileKey : null,
     fileName: isFileType ? rawFileName : null,
-    fileSize: isFileType && rawFileSize ? parseInt(rawFileSize, 10) : null,
+    fileSize: isFileType && rawFileSize ? (isNaN(parseInt(rawFileSize, 10)) ? null : parseInt(rawFileSize, 10)) : null,
     userId: session.user.id,
     createdAt: new Date(),
     updatedAt: new Date(),

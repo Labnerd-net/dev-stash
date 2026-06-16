@@ -124,12 +124,14 @@ export function ItemRow({ row, tags, isSelected, onToggle }: ItemRowProps) {
         {tags && tags.length > 0 && (
           <div className="flex flex-wrap gap-1 pt-0.5">
             {tags.map((tag) => (
-              <span
+              <Link
                 key={tag}
-                className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground"
+                href={`/tags/${encodeURIComponent(tag)}`}
+                onClick={(e) => e.stopPropagation()}
+                className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors"
               >
                 {tag}
-              </span>
+              </Link>
             ))}
           </div>
         )}
