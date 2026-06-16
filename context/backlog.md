@@ -14,7 +14,7 @@ _None identified._
 _None identified._
 
 ### Low
-- **#1 [src/middleware.ts:30]**: API routes (`/api/upload`, `/api/files`, `/api/export`) bypass middleware session checks entirely and rely on per-route `auth.api.getSession()` calls. This is an accepted architectural trade-off, but provides no middleware fallback if a session check is accidentally removed. Low risk currently; worth revisiting if the API surface grows.
+_None identified._
 
 ---
 
@@ -40,7 +40,7 @@ _None identified._
 _None identified._
 
 ### Low
-- **#2 [src/components/app/Sidebar.tsx]**: Tags and collections are re-fetched from DB on every page navigation. No caching layer. At scale this is a meaningful source of DB round-trips. Low priority for single-user usage.
+_None identified._
 
 ---
 
@@ -78,9 +78,9 @@ _None identified._
 
 | Category | High | Medium | Low | Total |
 |----------|------|--------|-----|-------|
-| Security | 0 | 0 | 1 | 1 |
+| Security | 0 | 0 | 0 | 0 |
 | Bugs | 0 | 0 | 0 | 0 |
-| Performance | 0 | 0 | 1 | 1 |
+| Performance | 0 | 0 | 0 | 0 |
 | Improvements & Refactors | 0 | 0 | 0 | 0 |
 | Feature Ideas | 0 | 2 | 4 | 6 |
-| **Total** | **0** | **2** | **5** | **7** |
+| **Total** | **0** | **2** | **4** | **6** |
