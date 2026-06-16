@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { items, itemTypes } from "@/db/schema";
-import { eq, and, or, desc, sql, inArray } from "drizzle-orm";
+import { eq, and, or, desc, sql, inArray, isNull, isNotNull } from "drizzle-orm";
 import { SEARCH_RESULT_LIMIT } from "@/lib/constants";
 
 export type ItemWithType = {
@@ -17,7 +17,7 @@ export async function getItemsByType(
     .select({ item: items, itemType: itemTypes })
     .from(items)
     .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
-    .where(and(eq(items.userId, userId), eq(items.typeId, typeId)))
+    .where(and(eq(items.userId, userId), eq(items.typeId, typeId), isNull(items.deletedAt)))
     .orderBy(desc(items.isPinned), desc(items.createdAt));
   const { limit, offset } = opts;
   if (limit !== undefined) return base.limit(limit).offset(offset ?? 0);
@@ -28,7 +28,7 @@ export async function getItemIdsByType(userId: string, typeId: string): Promise<
   const rows = await db
     .select({ id: items.id })
     .from(items)
-    .where(and(eq(items.userId, userId), eq(items.typeId, typeId)))
+    .where(and(eq(items.userId, userId), eq(items.typeId, typeId), isNull(items.deletedAt)))
     .orderBy(desc(items.isPinned), desc(items.createdAt));
   return rows.map((r) => r.id);
 }
@@ -38,7 +38,7 @@ export async function getFavoriteItems(userId: string) {
     .select({ item: items, itemType: itemTypes })
     .from(items)
     .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
-    .where(and(eq(items.userId, userId), eq(items.isFavorite, true)))
+    .where(and(eq(items.userId, userId), eq(items.isFavorite, true), isNull(items.deletedAt)))
     .orderBy(desc(items.createdAt));
 }
 
@@ -47,7 +47,7 @@ export async function getItemById(id: string, userId: string) {
     .select({ item: items, itemType: itemTypes })
     .from(items)
     .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
-    .where(and(eq(items.id, id), eq(items.userId, userId)));
+    .where(and(eq(items.id, id), eq(items.userId, userId), isNull(items.deletedAt)));
   return rows[0] ?? null;
 }
 
@@ -57,7 +57,7 @@ export async function getItemsByIds(userId: string, ids: string[]): Promise<Item
     .select({ item: items, itemType: itemTypes })
     .from(items)
     .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
-    .where(and(eq(items.userId, userId), inArray(items.id, ids)));
+    .where(and(eq(items.userId, userId), inArray(items.id, ids), isNull(items.deletedAt)));
   const indexMap = new Map(ids.map((id, i) => [id, i]));
   return rows.sort((a, b) => (indexMap.get(a.item.id) ?? 0) - (indexMap.get(b.item.id) ?? 0));
 }
@@ -70,7 +70,7 @@ export async function getAllItemsForExport(userId: string) {
     })
     .from(items)
     .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
-    .where(eq(items.userId, userId))
+    .where(and(eq(items.userId, userId), isNull(items.deletedAt)))
     .orderBy(desc(items.createdAt));
 }
 
@@ -106,6 +106,7 @@ export async function searchItems(
     .where(
       and(
         eq(items.userId, userId),
+        isNull(items.deletedAt),
         typeId ? eq(items.typeId, typeId) : undefined,
         or(textMatch, tagMatch)
       )
@@ -113,3 +114,13 @@ export async function searchItems(
     .orderBy(desc(items.createdAt))
     .limit(SEARCH_RESULT_LIMIT);
 }
+
+export async function getTrashedItems(userId: string): Promise<ItemWithType[]> {
+  return db
+    .select({ item: items, itemType: itemTypes })
+    .from(items)
+    .innerJoin(itemTypes, eq(items.typeId, itemTypes.id))
+    .where(and(eq(items.userId, userId), isNotNull(items.deletedAt)))
+    .orderBy(desc(items.deletedAt));
+}
+

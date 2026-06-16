@@ -11,12 +11,14 @@ import {
   Image,
   Link as LinkIcon,
   Heart,
+  Trash2,
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Favorites", href: "/favorites", icon: Heart },
+  { label: "Trash", href: "/trash", icon: Trash2 },
   { label: "Snippets", href: "/snippets", icon: Code2 },
   { label: "Prompts", href: "/prompts", icon: Sparkles },
   { label: "Notes", href: "/notes", icon: FileText },

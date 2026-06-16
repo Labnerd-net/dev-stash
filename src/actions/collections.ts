@@ -143,7 +143,8 @@ export async function deleteCollection(
   const { id } = parsed.data;
 
   await db
-    .delete(collections)
+    .update(collections)
+    .set({ deletedAt: new Date() })
     .where(and(eq(collections.id, id), eq(collections.userId, session.user.id)));
 
   revalidatePath("/collections");
