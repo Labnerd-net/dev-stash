@@ -143,5 +143,6 @@ Everything else depends on this phase being solid before moving on.
 
 ### 21. Keyboard Shortcuts
 - [ ] Cmd+K command palette (search + quick actions)
-- [ ] Cmd+N opens quick-create item drawer
-- [ ] Quick-create item drawer accessible from anywhere
+- [x] Cmd+N navigates to /items/new from anywhere (no drawer — uses dedicated page)
+- [x] Cmd+Shift+C navigates to /collections/new from anywhere
+- [x] Item row shortcuts: f = favorite, p = pin, c = copy (fires when row is focused via Tab)
