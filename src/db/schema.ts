@@ -184,3 +184,22 @@ export const itemTags = pgTable(
     index("item_tags_item_id_idx").on(table.itemId),
   ]
 );
+
+// ─── Recently Viewed ──────────────────────────────────────────────────────────
+
+export const userRecentlyViewed = pgTable(
+  "user_recently_viewed",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    itemId: text("item_id")
+      .notNull()
+      .references(() => items.id, { onDelete: "cascade" }),
+    viewedAt: timestamp("viewed_at").notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.itemId] }),
+    index("recently_viewed_user_id_idx").on(table.userId),
+  ]
+);

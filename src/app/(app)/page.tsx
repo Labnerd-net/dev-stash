@@ -7,6 +7,8 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { items, collections } from "@/db/schema";
 import { RecentlyUsedSection } from "@/components/dashboard/RecentlyUsedSection";
+import { getRecentlyViewedItems } from "@/lib/recently-used-queries";
+import { getTagsForItems } from "@/lib/tag-queries";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -19,12 +21,17 @@ export default async function DashboardPage() {
     [{ total: collectionCount }],
     [{ total: favItemCount }],
     [{ total: favCollectionCount }],
+    recentItems,
   ] = await Promise.all([
     db.select({ total: count() }).from(items).where(and(eq(items.userId, userId), isNull(items.deletedAt))),
     db.select({ total: count() }).from(collections).where(and(eq(collections.userId, userId), isNull(collections.deletedAt))),
     db.select({ total: count() }).from(items).where(and(eq(items.userId, userId), eq(items.isFavorite, true), isNull(items.deletedAt))),
     db.select({ total: count() }).from(collections).where(and(eq(collections.userId, userId), eq(collections.isFavorite, true), isNull(collections.deletedAt))),
+    getRecentlyViewedItems(userId, 10),
   ]);
+
+  const recentItemIds = recentItems.map((r) => r.item.id);
+  const recentTagsMap = await getTagsForItems(recentItemIds, userId);
 
   const stats = [
     { label: "Your Items",           value: itemCount,          icon: Package,    color: "text-blue-400",   bg: "bg-blue-500/10"   },
@@ -59,7 +66,7 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <RecentlyUsedSection />
+      <RecentlyUsedSection items={recentItems} tagsMap={recentTagsMap} />
 
       <div>
         <div className="flex items-center justify-between mb-4">

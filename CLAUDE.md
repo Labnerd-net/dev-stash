@@ -160,11 +160,12 @@ ESLint uses `eslint-config-next` (core-web-vitals + typescript rules) with flat 
 
 ## Recently Used Items
 
-- localStorage utility: `src/lib/recently-used.ts` — `pushRecentItem(id)` prepends + deduplicates + caps at 10; `getRecentItemIds()` reads safely (returns `[]` on SSR/error)
-- `RecentlyUsedTracker` (`src/components/items/RecentlyUsedTracker.tsx`) — client component, renders null, calls `pushRecentItem` once on mount via `useRef` + `useEffect`; mounted on item detail page
-- `fetchRecentItems(ids)` server action (`src/actions/recently-used.ts`) — resolves ID array to `{ items, tagsMap }` scoped by session userId; returns empty result if unauthenticated
-- `getItemsByIds(userId, ids[])` in `src/lib/item-queries.ts` — bulk fetch with `inArray`, client-side sort preserves recency order
-- `RecentlyUsedSection` (`src/components/dashboard/RecentlyUsedSection.tsx`) — client component on dashboard; reads localStorage + calls server action on mount; renders `ItemRow` list; hidden when empty or before hydration
+- DB table: `user_recently_viewed` (`userId`, `itemId`, `viewedAt`) — composite PK on `(userId, itemId)`; cascade-deletes when item is permanently deleted
+- `recordItemView(userId, itemId)` in `src/lib/recently-used-queries.ts` — upserts row, updating `viewedAt` on conflict; called fire-and-forget (`void ...catch()`) in item detail server component after `getItemById`
+- `getRecentlyViewedItems(userId, limit)` in `src/lib/recently-used-queries.ts` — joins `userRecentlyViewed` → `items` → `itemTypes`, filters `isNull(items.deletedAt)`, orders `desc(viewedAt)`
+- `RecentlyUsedSection` (`src/components/dashboard/RecentlyUsedSection.tsx`) — plain server component; receives `items: ItemWithType[]` and `tagsMap` as props from dashboard page; returns null when empty
+- Dashboard (`src/app/(app)/page.tsx`) — calls `getRecentlyViewedItems(userId, 10)` + `getTagsForItems` alongside stat queries; passes results to `<RecentlyUsedSection />`
+- `/recently-used` page — server component; calls `getRecentlyViewedItems(userId, 50)`; "Recent" sidebar link with `Clock` icon
 
 ## Soft Delete and Trash
 

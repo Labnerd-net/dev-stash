@@ -12,7 +12,7 @@ import { DeleteItemRedirect } from "@/components/items/DeleteItemRedirect";
 import { FavoriteItemButton } from "@/components/items/FavoriteItemButton";
 import { PinItemButton } from "@/components/items/PinItemButton";
 import { CopyButton } from "@/components/items/CopyButton";
-import { RecentlyUsedTracker } from "@/components/items/RecentlyUsedTracker";
+import { recordItemView } from "@/lib/recently-used-queries";
 import { AiCodeExplainer } from "@/components/items/AiCodeExplainer";
 import { AiSummary } from "@/components/items/AiSummary";
 import { AiPromptOptimizer } from "@/components/items/AiPromptOptimizer";
@@ -45,6 +45,7 @@ export default async function ItemDetailPage({ params }: Props) {
     getAllCollectionsForUser(session.user.id),
   ]);
   if (!row) notFound();
+  void recordItemView(session.user.id, row.item.id).catch(() => {});
 
   const siblingIds = await getItemIdsByType(session.user.id, row.item.typeId);
   const currentIndex = siblingIds.indexOf(id);
@@ -64,7 +65,6 @@ export default async function ItemDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <RecentlyUsedTracker itemId={item.id} />
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 space-y-1">
           <div className="flex items-center gap-2">

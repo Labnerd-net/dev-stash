@@ -43,6 +43,13 @@
       "when": 1781584107679,
       "tag": "0005_nifty_elektra",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781587602940,
+      "tag": "0006_big_crusher_hogan",
+      "breakpoints": true
     }
   ]
 }
