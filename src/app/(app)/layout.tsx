@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { SidebarProvider } from "@/components/app/SidebarContext";
 import { Sidebar } from "@/components/app/Sidebar";
 import { Header } from "@/components/app/Header";
+import { KeyboardShortcuts } from "@/components/app/KeyboardShortcuts";
 import { Toaster } from "@/components/ui/sonner";
 
 export default async function AppLayout({
@@ -26,6 +27,7 @@ export default async function AppLayout({
           <main className="flex-1 overflow-y-auto p-6">{children}</main>
         </div>
       </div>
+      <KeyboardShortcuts />
       <Toaster position="bottom-right" duration={2000} />
     </SidebarProvider>
   );

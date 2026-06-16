@@ -1,12 +1,15 @@
 "use client";
 
+import { useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pin } from "lucide-react";
+import { toast } from "sonner";
 import { DeleteItemButton } from "./DeleteItemButton";
 import { FavoriteItemButton } from "./FavoriteItemButton";
 import { PinItemButton } from "./PinItemButton";
 import { CopyButton } from "./CopyButton";
+import { toggleItemFavorite, toggleItemPin } from "@/actions/favorites";
 import type { ItemWithType } from "@/lib/item-queries";
 import { stripHtml, formatBytes } from "@/lib/html-utils";
 
@@ -51,12 +54,44 @@ function getPreview(row: ItemWithType): string {
 
 export function ItemRow({ row, tags, isSelected, onToggle }: ItemRowProps) {
   const router = useRouter();
+  const [, startTransition] = useTransition();
   const { item, itemType } = row;
   const preview = getPreview(row);
   const copyContent = getCopyContent(row);
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLLIElement>) {
+    if (e.target !== e.currentTarget) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    if (e.key === "f") {
+      e.preventDefault();
+      startTransition(async () => {
+        await toggleItemFavorite(item.id);
+        router.refresh();
+      });
+    } else if (e.key === "p") {
+      e.preventDefault();
+      startTransition(async () => {
+        await toggleItemPin(item.id);
+        router.refresh();
+      });
+    } else if (e.key === "c") {
+      e.preventDefault();
+      if (!copyContent) return;
+      const text = copyContent.includes("<") ? stripHtml(copyContent) : copyContent;
+      navigator.clipboard.writeText(text).then(
+        () => toast.success("Copied to clipboard"),
+        () => toast.error("Failed to copy")
+      );
+    }
+  }
+
   return (
-    <li className={`group flex items-start justify-between gap-4 px-4 py-3 hover:bg-muted/30 transition-colors${isSelected ? " bg-muted/20" : ""}`}>
+    <li
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      className={`group flex items-start justify-between gap-4 px-4 py-3 hover:bg-muted/30 transition-colors focus:outline-none focus:ring-1 focus:ring-primary/40 rounded-sm${isSelected ? " bg-muted/20" : ""}`}
+    >
       {onToggle && (
         <input
           type="checkbox"
