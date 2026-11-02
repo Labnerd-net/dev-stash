@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
-const PUBLIC_PATHS = ["/sign-in", "/sign-up"];
+const PUBLIC_PATHS = ["/welcome", "/sign-in", "/sign-up"];
 
 // Edge middleware runs on the Cloudflare Workers runtime, which does not have
 // access to the database or the signing keys needed for full session validation.
@@ -16,6 +16,11 @@ export function middleware(request: NextRequest) {
 
   if (sessionCookie && PUBLIC_PATHS.includes(pathname)) {
     return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // Visitors without a session see the landing page at "/" (URL stays "/").
+  if (!sessionCookie && pathname === "/") {
+    return NextResponse.rewrite(new URL("/welcome", request.url));
   }
 
   if (!sessionCookie && !PUBLIC_PATHS.includes(pathname)) {
