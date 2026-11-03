@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { buttonVariants } from "@/lib/button-variants";
+import { DemoButton } from "@/components/auth/DemoButton";
 
 interface ItemTypeCard {
   name: string;
@@ -90,10 +91,11 @@ export default function WelcomePage() {
             <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
               Get started
             </Link>
-            <Link href="/sign-in" className={buttonVariants({ variant: "outline", size: "lg" })}>
-              Sign in
-            </Link>
+            <DemoButton />
           </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            No sign-up needed. The demo comes pre-filled with sample items and resets every hour.
+          </p>
         </section>
 
         <section className="mx-auto max-w-5xl px-6 pb-20" aria-labelledby="types-heading">
