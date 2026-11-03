@@ -11,6 +11,7 @@ Branch:
 Plan file:
 
 ## History
+- Demo Account: "Try the demo" button on the landing page calls startDemo server action (src/actions/demo.ts), which signs in as the seeded demo@devstash.app user via auth.api.signInEmail using the DEMO_PASSWORD env var (nextCookies plugin added to better-auth so server actions can set the session cookie); demo user and credential account created by `npm run db:seed-demo` (src/db/seed-demo.ts, run with --env-file) so ALLOWED_EMAILS is unchanged; src/lib/demo-data.ts holds the seed content (12 text/URL items, 3 collections, tags, favorites, pins, recent history) and resetDemoData, which replaces everything in one atomic db.batch; data resets lazily on demo sign-in when older than 1 hour (users.updatedAt as marker, no cron); POST /api/upload returns 403 for the demo user; AI features intentionally left enabled; production needs DEMO_PASSWORD as a wrangler secret and the seed run against the production DB
 
 <!-- Keep this updated. Earliest to latest -->
 - Database Schema + Migration: defined Drizzle schema, generated and applied migration, seeded system item types

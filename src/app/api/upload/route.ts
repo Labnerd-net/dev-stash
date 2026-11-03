@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { auth } from "@/lib/auth";
 import { MAX_UPLOAD_SIZE } from "@/lib/constants";
+import { isDemoUser } from "@/lib/demo";
 
 const MAX_SIZE = MAX_UPLOAD_SIZE;
 
@@ -31,6 +32,9 @@ function sanitizeFilename(name: string): string {
 export async function POST(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  if (isDemoUser(session.user.email)) {
+    return Response.json({ error: "File uploads are disabled in the demo" }, { status: 403 });
+  }
 
   const formData = await request.formData();
   const file = formData.get("file");
