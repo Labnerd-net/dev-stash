@@ -2,7 +2,7 @@
 
 ## Use Case
 
-A web app that tags, summarizes, and explains items including links, code snippets, AI prompts, terminal commands, and tech notes.
+A web app that tags, summarizes, and explains items including links, code snippets, AI prompts, terminal commands, and tech notes. 
 
 Key requirements: reliable instruction-following, structured output (JSON), code comprehension, and cost efficiency at volume.
 
