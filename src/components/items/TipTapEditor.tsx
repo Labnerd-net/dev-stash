@@ -60,7 +60,7 @@ export function TipTapEditor({ value, onChange }: TipTapEditorProps) {
       </div>
       <EditorContent
         editor={editor}
-        className="prose prose-sm prose-invert max-w-none min-h-[200px] p-3 focus-within:ring-2 focus-within:ring-ring focus-within:ring-inset"
+        className="prose prose-sm dark:prose-invert max-w-none min-h-[200px] p-3 focus-within:ring-2 focus-within:ring-ring focus-within:ring-inset"
       />
     </div>
   );
