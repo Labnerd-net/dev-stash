@@ -5,10 +5,9 @@
 **Live demo: [devstash.labnerd.net](https://devstash.labnerd.net/)**. Click **Try the demo** to
 explore without signing up — it creates a throwaway account that resets hourly.
 
-<!-- TODO: add 2-3 screenshots (dashboard, item editor, command palette)
 ![Dashboard](docs/screenshots/dashboard.png)
-![Item editor](docs/screenshots/editor.png)
--->
+![Item detail](docs/screenshots/item-detail.png)
+![Command palette](docs/screenshots/command-palette.png)
 
 A centralized developer knowledge hub for storing and searching code snippets, AI prompts,
 notes, commands, URLs, files, and images — all in one place, instead of scattered across editor
