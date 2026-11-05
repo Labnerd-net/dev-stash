@@ -148,3 +148,7 @@
   color: oklch(50% 0 0);
   user-select: none;
 }
+.prose code::before,
+.prose code::after {
+  content: none;
+}

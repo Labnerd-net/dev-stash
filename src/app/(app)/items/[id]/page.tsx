@@ -112,7 +112,7 @@ export default async function ItemDetailPage({ params }: Props) {
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Content</p>
           {item.typeId === "system_note" ? (
             <div
-              className="prose prose-sm prose-invert max-w-none rounded-lg border border-border bg-muted p-4"
+              className="prose prose-sm dark:prose-invert max-w-none rounded-lg border border-border bg-muted p-4"
               dangerouslySetInnerHTML={{ __html: item.content }}
             />
           ) : CODE_TYPE_IDS.has(item.typeId) ? (
