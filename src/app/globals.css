@@ -134,8 +134,13 @@
 .line-numbers {
   counter-reset: line;
 }
+.line-numbers code {
+  display: flex;
+  flex-direction: column;
+}
 .line-numbers .line {
   display: block;
+  min-height: 1lh;
 }
 .line-numbers .line::before {
   counter-increment: line;
