@@ -102,6 +102,12 @@ export default function SignUpPage() {
             Sign in
           </Link>
         </p>
+
+        <p className="text-center text-sm text-muted-foreground">
+          <Link href="/" className="text-foreground underline underline-offset-4 hover:opacity-80">
+            Back to home
+          </Link>
+        </p>
       </div>
     </div>
   );
